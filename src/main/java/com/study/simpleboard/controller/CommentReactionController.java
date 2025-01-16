@@ -20,7 +20,7 @@ public class CommentReactionController {
 
     @PostMapping("comments/{commentId}/reaction")
     public String addCommentReaction(@PathVariable Long commentId, @RequestBody CommentReactionDTO commentReactionDTO) {
-        // commentId를 DTO에 설정
+
         CommentReactionDTO reaction = new CommentReactionDTO(
                 commentReactionDTO.reactionId(),
                 commentReactionDTO.userId(),
@@ -30,7 +30,7 @@ public class CommentReactionController {
                 commentReactionDTO.isActive()
         );
 
-        // 리액션 데이터 삽입
+
         commentReactionService.addCommentReaction(commentId, commentReactionDTO);
         return "Reaction added successfully!";
     }

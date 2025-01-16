@@ -3,8 +3,6 @@ package com.study.simpleboard.service;
 import com.study.simpleboard.domain.TargetType;
 import com.study.simpleboard.dto.CommentReactionDTO;
 import com.study.simpleboard.mapper.CommentReactionMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
