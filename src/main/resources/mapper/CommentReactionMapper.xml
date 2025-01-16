@@ -1,0 +1,20 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.CommentReactionMapper">
+
+    <insert id="insertCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
+        INSERT INTO reaction (
+        user_id,
+        target_id,
+        target_type,
+        reaction_type,
+        is_active
+        ) VALUES (
+        #{userId},
+        #{targetId},
+        #{targetType},
+        #{reactionType},
+        #{isActive}
+        )
+    </insert>
+
+</mapper>
