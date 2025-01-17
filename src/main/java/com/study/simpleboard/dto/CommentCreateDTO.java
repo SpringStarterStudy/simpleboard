@@ -3,10 +3,10 @@ package com.study.simpleboard.dto;
 import java.time.LocalDateTime;
 
 public class CommentCreateDTO {
-    private Long userId;
-    private Long postId;
-    private String commentContent;
-    private LocalDateTime createdAt;
+    private final Long userId;
+    private final Long postId;
+    private final String commentContent;
+    private final LocalDateTime createdAt;
 
     public CommentCreateDTO(Long userId, Long postId, String commentContent) {
         this.userId = userId;
