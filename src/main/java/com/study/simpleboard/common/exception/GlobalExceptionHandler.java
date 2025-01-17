@@ -4,6 +4,7 @@ import com.study.simpleboard.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,11 +24,13 @@ public class GlobalExceptionHandler {
 
     // ValidationException 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
-        log.error("Validation 예외 발생: {}", e.getMessage());
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(
+        BindingResult bindingResult) {
+        log.error("Validation 예외 발생: {}", bindingResult.getAllErrors());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error(HttpStatus.BAD_REQUEST, "잘못된 입력 값입니다."));
+            .body(ApiResponse.error(HttpStatus.BAD_REQUEST,
+                bindingResult.getAllErrors().get(0).getDefaultMessage()));
     }
 
 
