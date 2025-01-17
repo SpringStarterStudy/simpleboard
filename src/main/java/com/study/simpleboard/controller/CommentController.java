@@ -3,6 +3,7 @@ package com.study.simpleboard.controller;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CommentCreateRequestDTO;
 import com.study.simpleboard.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     public ApiResponse<Void> createComment(@PathVariable Long postId,
-        @RequestBody CommentCreateRequestDTO requestDTO) { //TODO 인증객체에서 user 받기
+        @Valid @RequestBody CommentCreateRequestDTO requestDTO) { //TODO 인증객체에서 user 받기
         commentService.createComment(postId, 1L, requestDTO);
         return ApiResponse.success("댓글이 생성되었습니다.");  //TODO response 수정
     }
