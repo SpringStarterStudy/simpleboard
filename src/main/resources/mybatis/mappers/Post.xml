@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.PostMapper">
+    <!-- 전체 게시물 조회 -->
+    <select id="selectAllPost" resultType="com.study.simpleboard.dto.PostDto$Info">
+        SELECT
+            post_id AS id,
+            user_id AS userId,
+            post_title AS title,
+            post_content AS content,
+            created_at AS createdAt,
+            updated_at AS updatedAt,
+            deleted_at AS deletedAt,
+            view_count AS viewCount
+        FROM post
+        WHERE deleted_at IS NULL
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchUser != null and searchUser != ''">
+                AND user_id = #{searchUser}
+            </if>
+        ORDER BY post_id DESC
+        <!-- 페이지네이션 적용 (MySQL 문법) -->
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 전체 게시글 수 조회 -->
+    <select id="countPosts" resultType="long">
+        SELECT count(*)
+        FROM post
+        WHERE deleted_at IS NULL
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND post_content like concat('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchUser != null and searchUser != ''">
+                AND user_id = #{searchUser}
+            </if>
+
+    </select>
+
+</mapper>
