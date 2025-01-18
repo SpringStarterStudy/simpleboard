@@ -2,15 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.simpleboard.mapper.PostMapper">
     <!-- 전체 게시물 조회 -->
-    <select id="selectAllPost" resultType="com.study.simpleboard.dto.PostDto$Info">
+    <select id="selectAllPost" resultType="com.study.simpleboard.dto.PostDto$ListInfo">
         SELECT
             post_id AS id,
             user_id AS userId,
             post_title AS title,
-            post_content AS content,
             created_at AS createdAt,
-            updated_at AS updatedAt,
-            deleted_at AS deletedAt,
             view_count AS viewCount
         FROM post
         WHERE deleted_at IS NULL

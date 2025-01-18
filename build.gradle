@@ -27,9 +27,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-	implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'	// 로그를 이용한 확인 추가
-	implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.4.1' // 페이징 처리를 위한 추가
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.4.1' // 페이지 검색에 따른 유효성을 위해 추가
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.data:spring-data-commons'	// 페이징 처리를 위한 추가
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'

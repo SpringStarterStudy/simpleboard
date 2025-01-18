@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
     // 게시물 전체 목록 조회
-    List<PostDto.Info> selectAllPost(
+    List<PostDto.ListInfo> selectAllPost(
             @Param("offset") int offset,
             @Param("pageSize") int pageSize,
             @Param("searchKeyword") String searchKeyword,

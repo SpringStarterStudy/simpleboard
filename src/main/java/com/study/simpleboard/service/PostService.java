@@ -12,8 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,32 +24,47 @@ public class PostService {
 
     // 전체 게시물 목록 조회
     @Transactional(readOnly = true)
-    public PostDto.PostsAndPageResponse<PostDto.Info> findAllPost(
+    public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPost(
             Pageable pageable, String searchKeyword, String searchUser
     ) {
 
         long totalPostCount = postMapper.countPosts(searchKeyword, searchUser);
 
         if(totalPostCount == 0) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+            return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+                    .postList(List.of())
+                    .currentPage(pageable.getPageNumber() + 1)
+                    .currentSize(0)
+                    .postPerPage(pageable.getPageSize())
+                    .totalPostsCount(0L)
+                    .totalPages(0)
+                    .pageGroupSize(5)
+                    .build();
         }
 
         int totalPages = (int) ((totalPostCount + pageable.getPageSize() - 1) / pageable.getPageSize());
         if(pageable.getPageNumber() >= totalPages) {
-            throw new CustomException(ErrorCode.PAGE_NOT_FOUND);
+            return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+                    .postList(List.of())
+                    .currentPage(pageable.getPageNumber() + 1)
+                    .currentSize(0)
+                    .postPerPage(pageable.getPageSize())
+                    .totalPostsCount(totalPostCount)
+                    .totalPages(totalPages)
+                    .pageGroupSize(5)
+                    .build();
         }
 
         int offset = (int) pageable.getOffset();
         int pageSize = pageable.getPageSize();
 
-        List<PostDto.Info> postList = Optional.ofNullable(
-                postMapper.selectAllPost(offset, pageSize, searchKeyword, searchUser))
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+        List<PostDto.ListInfo> postList =
+                postMapper.selectAllPost(offset, pageSize, searchKeyword, searchUser);
 
-        Page<PostDto.Info> postPage = new PageImpl<>(postList, pageable, totalPostCount);
+        Page<PostDto.ListInfo> postPage = new PageImpl<>(postList, pageable, totalPostCount);
 
-        return PostDto.PostsAndPageResponse.<PostDto.Info>builder()
-                .content(postPage.getContent())
+        return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+                .postList(postPage.getContent())
                 .currentPage(postPage.getNumber() + 1)
                 .currentSize(postPage.getNumberOfElements())
                 .postPerPage(postPage.getSize())
