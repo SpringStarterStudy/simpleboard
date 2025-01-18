@@ -5,7 +5,7 @@ import com.study.simpleboard.enums.TargetType;
 import lombok.*;
 
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Reaction {
     private final Long id;
     private final Long userId;
