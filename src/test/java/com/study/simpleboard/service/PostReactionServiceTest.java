@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ class PostReactionServiceTest {
 
         // Given: Mock 데이터 정의
         List<Reaction> mockReactions = List.of(
-                reaction(ReactionType.LIKE, LIKE_STATUS), reaction(ReactionType.DISLIKE, DISLIKE_STATUS));
+                getReaction(ReactionType.LIKE, LIKE_STATUS), getReaction(ReactionType.DISLIKE, DISLIKE_STATUS));
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
@@ -64,7 +65,7 @@ class PostReactionServiceTest {
         // 기대 결과: "like=조회 데이터, dislike=false 반환"
 
         // Given: Mock 데이터 정의
-        List<Reaction> mockReactions = List.of(reaction(ReactionType.LIKE, LIKE_STATUS));
+        List<Reaction> mockReactions = List.of(getReaction(ReactionType.LIKE, LIKE_STATUS));
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
@@ -107,7 +108,7 @@ class PostReactionServiceTest {
 
         // Given: Mock 데이터 정의
         PostReactionReq mockReq = new PostReactionReq(USER_ID, LIKE_STATUS, null);
-        Optional<Reaction> mockReaction = Optional.of(reaction(ReactionType.LIKE, LIKE_STATUS));
+        Optional<Reaction> mockReaction = Optional.of(getReaction(ReactionType.LIKE, LIKE_STATUS));
         when(postReactionRepository.findReaction(POST_ID, mockReq, ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
@@ -139,13 +140,15 @@ class PostReactionServiceTest {
 
     // TODO: 예외처리 관련 테스트 코드는 나중에 추가 예정
 
-    private static Reaction reaction(ReactionType reactionType, boolean active) {
-        return Reaction.builder()
+    private static Reaction getReaction(ReactionType reactionType, boolean active) {
+        Reaction reaction = Reaction.builder()
                 .userId(USER_ID)
                 .targetId(POST_ID)
                 .targetType(TargetType.POST)
                 .reactionType(reactionType)
                 .active(active)
                 .build();
+        ReflectionTestUtils.setField(reaction, "id", 1L);
+        return reaction;
     }
 }
