@@ -3,7 +3,6 @@ package com.study.simpleboard.controller;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.service.PostService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

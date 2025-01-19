@@ -6,6 +6,7 @@ public class PostDto {
 
     // 게시물 상세 정보
     @Getter
+    @Builder
     public static class Detail {
         private Long id;
         private Long userId;

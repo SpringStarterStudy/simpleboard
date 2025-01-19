@@ -18,12 +18,24 @@ public class PostService {
 
     @Transactional
     public PostDto.Detail findPostById(Long postId) {
+        if(postId <= 0) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
         PostDto.Detail post = postMapper.selectPostById(postId).
                 orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        postMapper.updateViewCount(post.getId(), post.getViewCount());
+        postMapper.updateViewCount(post.getId());
 
-        return post;
+        return PostDto.Detail.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .viewCount(post.getViewCount() + 1)
+                .build();
     }
 
 }

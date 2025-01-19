@@ -14,11 +14,15 @@
             view_count AS viewCount
         FROM post
         WHERE post_id = #{postId}
+            AND deleted_at IS NULL
     </select>
 
     <!-- 조회수 증가 -->
     <update id="updateViewCount" parameterType="long">
-        UPDATE post SET view_count = #{viewCount} + 1
+        UPDATE post
+        SET view_count = view_count + 1
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
     </update>
 
 </mapper>
