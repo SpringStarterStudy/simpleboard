@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.simpleboard.mapper.UserMapper">
+
+    <!-- 회원 가입 -->
+    <insert id="insertUser" parameterType="com.study.simpleboard.dto.UserDTO" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (
+            name,
+            email,
+            password,
+            cell_phone,
+            login_type,
+            is_enabled,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{name},
+            #{email},
+            #{password},
+            #{cellPhone},
+            #{loginType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            #{isEnabled},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <select id="existsByName" parameterType="string" resultType="booelan">
+        SELECT EXISTS (
+            SELECT 1
+            FROM user
+            WHERE name = #{name}
+    </select>
+
+    <select id="existsByEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM user
+            WHERE email = #{email}
+    </select>
+
+</mapper>
