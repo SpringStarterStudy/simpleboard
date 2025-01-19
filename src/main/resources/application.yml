@@ -6,3 +6,9 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+  mybatis:
+    mapper-locations: classpath:mapper/**/*.xml
+    configuration:
+      map-underscore-to-camel-case: true
+      default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler # ENUM 타입 사용

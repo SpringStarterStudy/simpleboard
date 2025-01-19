@@ -2,16 +2,10 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.dto.UserDTO;
 import com.study.simpleboard.mapper.UserMapper;
-import com.study.simpleboard.validator.CellphoneValidator;
-import com.study.simpleboard.validator.EmailValidator;
-import com.study.simpleboard.validator.NameValidator;
-import com.study.simpleboard.validator.PasswordValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 
 @Service
@@ -20,19 +14,17 @@ import java.time.LocalDateTime;
 public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화를 위한 인코더
-    private final NameValidator nameValidator;
-    private final PasswordValidator passwordValidator;
-    private final EmailValidator emailValidator;
-    private final CellphoneValidator cellphoneValidator;
 
     // 회원 가입
     public void signUp(UserDTO userDTO) {
+        // 중복 체크
+        if (userMapper.existsByName(userDTO.getName())) {
+            throw new IllegalArgumentException("이미 존재하는 이름입니다.");
+        }
 
-        // 유효성 검사
-        nameValidator.validateName(userDTO.getName());
-        passwordValidator.validatePassword(userDTO.getPassword());
-        emailValidator.validateEmail(userDTO.getEmail());
-        cellphoneValidator.validateCellphone(userDTO.getCellPhone());
+        if (userMapper.existsByEmail(userDTO.getEmail())) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+        }
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());

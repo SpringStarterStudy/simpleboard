@@ -23,7 +23,4 @@ public interface UserMapper { // 기본적인 CRUD 작업
 
     // 회원 삭제
 
-
-    // 중복 체크
-
 }
