@@ -23,7 +23,7 @@ public class PostReactionController {
         return ResponseEntity.ok(reactionResponse);
     }
 
-    // like 또는 dislike 활성화 상태에 대한 요청을 받아서 db에 반영한 후 204 응답
+    // like 또는 dislike 활성화 상태에 대한 요청을 받아서 저장한 후 204 응답
     // 요청받은 데이터에 like 또는 dislike가 존재하지 않을 경우 400 응답
     @PostMapping("/api/posts/{postId}/reaction")
     public ResponseEntity<Void> saveReaction(@PathVariable Long postId, @RequestBody PostReactionReq postReactionReq) {
