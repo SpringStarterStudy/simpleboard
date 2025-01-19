@@ -1,6 +1,6 @@
 package com.study.simpleboard.controller;
 
-import com.study.simpleboard.domain.TargetType;
+import com.study.simpleboard.common.ApiResponse;
 import com.study.simpleboard.dto.CommentReactionDTO;
 import com.study.simpleboard.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +14,27 @@ public class CommentReactionController {
     @Autowired
     private CommentReactionService commentReactionService;
 
-
+    // 댓글 반응 업데이트
     @PostMapping("comments/{commentId}/reaction")
-    public ResponseEntity<String> addCommentReaction(@PathVariable Long commentId, @RequestBody CommentReactionDTO commentReactionDTO) {
-
-        CommentReactionDTO reaction = new CommentReactionDTO(
-                commentReactionDTO.reactionId(),
-                commentReactionDTO.userId(),
+    public ApiResponse<Void> handleReaction(
+            @PathVariable Long commentId,
+            @RequestBody CommentReactionDTO inputReactionDTO) {
+        commentReactionService.updateCommentReaction(
+                inputReactionDTO.userId(),
                 commentId,
-                TargetType.COMMENT,
-                commentReactionDTO.reactionType(),
-                commentReactionDTO.isActive()
-        );
-
-
-        commentReactionService.addCommentReaction(commentId, commentReactionDTO);
-        return ResponseEntity.ok("Reaction added successfully!");
+                inputReactionDTO);
+        return ApiResponse.success("Reaction processed successfully!");
     }
 
+    // 댓글 반응 여부 조회
+    @GetMapping("comments/{commentId}/reaction")
+    public ApiResponse<CommentReactionDTO> getReaction(
+            @PathVariable Long commentId,
+            @RequestParam Long userId) {
+        CommentReactionDTO reaction = commentReactionService.findReactionByUserAndComment(userId, commentId);
+
+        return reaction != null
+                ? ApiResponse.success("Reaction retrieved successfully!", reaction)
+                : ApiResponse.success("No reaction found",null);
+    }
 }
