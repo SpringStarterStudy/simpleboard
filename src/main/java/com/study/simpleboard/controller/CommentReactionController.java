@@ -1,11 +1,13 @@
 package com.study.simpleboard.controller;
 
-import com.study.simpleboard.common.ApiResponse;
+import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.domain.ReactionType;
 import com.study.simpleboard.dto.CommentReactionDTO;
 import com.study.simpleboard.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -28,13 +30,10 @@ public class CommentReactionController {
 
     // 댓글 반응 여부 조회
     @GetMapping("comments/{commentId}/reaction")
-    public ApiResponse<CommentReactionDTO> getReaction(
+    public ApiResponse<Map<ReactionType, Boolean>> getCommentReactionStatus(
             @PathVariable Long commentId,
             @RequestParam Long userId) {
-        CommentReactionDTO reaction = commentReactionService.findReactionByUserAndComment(userId, commentId);
-
-        return reaction != null
-                ? ApiResponse.success("Reaction retrieved successfully!", reaction)
-                : ApiResponse.success("No reaction found",null);
+        Map<ReactionType, Boolean> reactionStatus = commentReactionService.findCommentReactionStatus(userId, commentId);
+        return ApiResponse.success("Comment reaction status retrieved successfully!", reactionStatus);
     }
 }

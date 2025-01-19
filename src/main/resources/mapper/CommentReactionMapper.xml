@@ -19,7 +19,7 @@
     </insert>
 
     <!-- Find Reaction by User ID and Comment ID -->
-    <select id="findByUserIdAndCommentId" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
+    <select id="findAllByUserIdAndCommentId" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
         SELECT
         reaction_id,
         user_id,
@@ -32,14 +32,6 @@
         AND target_id = #{targetId}
     </select>
 
-    <!-- Update Reaction Type and Status -->
-    <update id="updateCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
-        UPDATE reaction
-        SET reaction_type = #{reactionType},
-        is_active = #{isActive}
-        WHERE user_id = #{userId}
-        AND target_id = #{targetId};
-    </update>
 
     <!-- Toggle Reaction Status -->
     <update id="updateReactionStatus" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
@@ -47,5 +39,21 @@
         SET is_active = #{isActive}
         WHERE reaction_id = #{reactionId};
     </update>
+
+
+    <select id="findByUserIdCommentIdAndReactionType" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
+        SELECT
+        reaction_id,
+        user_id,
+        target_id,
+        target_type,
+        reaction_type,
+        is_active
+        FROM reaction
+        WHERE user_id = #{userId}
+        AND target_id = #{commentId}
+        AND reaction_type = #{reactionType}
+    </select>
+
 
 </mapper>
