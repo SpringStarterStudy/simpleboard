@@ -1,6 +1,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.simpleboard.mapper.CommentReactionMapper">
 
+    <!-- Insert Reaction -->
     <insert id="insertCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
         INSERT INTO reaction (
         user_id,
@@ -16,5 +17,35 @@
         #{isActive}
         )
     </insert>
+
+    <!-- Find Reaction by User ID and Comment ID -->
+    <select id="findByUserIdAndCommentId" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
+        SELECT
+        reaction_id,
+        user_id,
+        target_id,
+        target_type,
+        reaction_type,
+        is_active
+        FROM reaction
+        WHERE user_id = #{userId}
+        AND target_id = #{targetId}
+    </select>
+
+    <!-- Update Reaction Type and Status -->
+    <update id="updateCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
+        UPDATE reaction
+        SET reaction_type = #{reactionType},
+        is_active = #{isActive}
+        WHERE user_id = #{userId}
+        AND target_id = #{targetId};
+    </update>
+
+    <!-- Toggle Reaction Status -->
+    <update id="updateReactionStatus" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
+        UPDATE reaction
+        SET is_active = #{isActive}
+        WHERE reaction_id = #{reactionId};
+    </update>
 
 </mapper>
