@@ -8,20 +8,6 @@ import java.util.List;
 
 public class PostDto {
 
-    // 게시물의 상세 정보
-    @Getter
-    public static class Info {
-        private Long id;
-        private Long userId;
-        private String title;
-        private String content;
-        private String createdAt;
-        private String updatedAt;
-        private String deletedAt;
-        private Long viewCount;
-    }
-
-    // 게시물 전체 목록
     @Getter
     public static class ListInfo {
         private Long id;
@@ -31,7 +17,7 @@ public class PostDto {
         private Long viewCount;
     }
 
-    // 전체 게시물의 정보와 페이지네이션
+    // 전체 게시물의 간략한 정보와 페이지네이션
     @Getter
     @Builder
     @AllArgsConstructor
@@ -46,6 +32,7 @@ public class PostDto {
         private Integer pageGroupSize;  // 페이지 그룹의 크기 (default:5)
     }
 
+    // 검색 조건과 페이징 정보
     @Getter
     @Setter
     @NoArgsConstructor

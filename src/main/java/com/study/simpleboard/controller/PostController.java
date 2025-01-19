@@ -19,12 +19,12 @@ public class PostController {
 
     // 게시글 목록 전체 보기
     @GetMapping("/posts")
-    public ApiResponse<PostDto.PostsAndPageResponse<PostDto.ListInfo>> postList(
+    public ApiResponse<PostDto.PostsAndPageResponse<PostDto.ListInfo>> getAllPosts(
             @Valid @ModelAttribute PostDto.SearchRequest searchRequest
             ) {
 
         PostDto.PostsAndPageResponse<PostDto.ListInfo> response =
-                postService.findAllPost(searchRequest.toPageable(),
+                postService.findAllPosts(searchRequest.toPageable(),
                         searchRequest.getSearchKeyword(), searchRequest.getSearchUser());
 
         return ApiResponse.success("게시물 목록을 성공적으로 조회했습니다.", response);

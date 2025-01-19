@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -24,7 +23,7 @@ public class PostService {
 
     // 전체 게시물 목록 조회
     @Transactional(readOnly = true)
-    public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPost(
+    public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPosts(
             Pageable pageable, String searchKeyword, String searchUser
     ) {
 
@@ -44,22 +43,14 @@ public class PostService {
 
         int totalPages = (int) ((totalPostCount + pageable.getPageSize() - 1) / pageable.getPageSize());
         if(pageable.getPageNumber() >= totalPages) {
-            return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
-                    .postList(List.of())
-                    .currentPage(pageable.getPageNumber() + 1)
-                    .currentSize(0)
-                    .postPerPage(pageable.getPageSize())
-                    .totalPostsCount(totalPostCount)
-                    .totalPages(totalPages)
-                    .pageGroupSize(5)
-                    .build();
+            throw new CustomException(ErrorCode.PAGE_NOT_FOUND);
         }
 
         int offset = (int) pageable.getOffset();
         int pageSize = pageable.getPageSize();
 
         List<PostDto.ListInfo> postList =
-                postMapper.selectAllPost(offset, pageSize, searchKeyword, searchUser);
+                postMapper.selectAllPosts(offset, pageSize, searchKeyword, searchUser);
 
         Page<PostDto.ListInfo> postPage = new PageImpl<>(postList, pageable, totalPostCount);
 
