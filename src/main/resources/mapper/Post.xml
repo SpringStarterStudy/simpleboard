@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.PostMapper">
+
+    <!-- 게시물 상세 조회 -->
+    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$Detail">
+        SELECT
+            post_id AS id,
+            user_id AS userId,
+            post_title AS title,
+            post_content AS content,
+            created_at AS createdAt,
+            updated_at AS updatedAt,
+            view_count AS viewCount
+        FROM post
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="updateViewCount" parameterType="long">
+        UPDATE post
+        SET view_count = view_count + 1
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </update>
+
+</mapper>
