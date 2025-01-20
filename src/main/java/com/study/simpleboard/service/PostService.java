@@ -14,6 +14,7 @@ public class PostService {
 
     @Transactional
     public void savePost(PostCreateReq postCreateReq) {
+        // userId 검증은 나중에 인증 구현 후 추가 예정
         postRepository.save(Post.from(postCreateReq));
     }
 }
