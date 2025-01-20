@@ -4,27 +4,23 @@ import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.study.simpleboard.dto.PostDto;
-import com.study.simpleboard.mapper.PostMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import com.study.simpleboard.domain.Post;
+import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.repository.PostRepository;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
-
     private final PostMapper postMapper;
+    private final PostRepository postRepository;
     private static final int PAGE_GROUP_SIZE = 5;
 
     // 전체 게시물 목록 조회
@@ -109,4 +105,8 @@ public class PostService {
         postMapper.deletePostById(postId, userId);
     }
 
+    @Transactional
+    public void savePost(PostCreateReq postCreateReq) {
+        postRepository.save(Post.from(postCreateReq));
+    }
 }
