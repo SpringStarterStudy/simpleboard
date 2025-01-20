@@ -54,9 +54,9 @@ public class PostController {
     }
 
     // 게시물 작성
-    @PostMapping("/posts")
-    public ResponseEntity<ApiResponse<Void>> savePost(@RequestBody PostCreateReq postCreateReq) {
+    @PostMapping("/api/posts")
+    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
         postService.savePost(postCreateReq);
-        return ResponseEntity.ok(ApiResponse.success("게시글이 저장되었습니다."));
+        return ApiResponse.success("게시글이 저장되었습니다.");
     }
 }
