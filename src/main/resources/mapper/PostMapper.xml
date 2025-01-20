@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.PostMapper">
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into post(user_id, post_title, post_content, created_at, view_count)
+        values(#{post.userId}, #{post.title}, #{post.content}, #{post.createdAt}, #{post.viewCount})
+    </insert>
+</mapper>

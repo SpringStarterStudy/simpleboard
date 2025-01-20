@@ -2,7 +2,7 @@ package com.study.simpleboard.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import com.study.simpleboard.dto.PostDto;
-import org.apache.ibatis.annotations.Mapper;
+import com.study.simpleboard.domain.Post;
 import java.util.Optional;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -33,4 +33,6 @@ public interface PostMapper {
     // 게시물 삭제 (soft-delete)
     void deletePostById(Long postId, Long userId);
 
+    // 게시물 작성
+    void save(@Param("post") Post post);
 }
