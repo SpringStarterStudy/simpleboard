@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.PostMapper">
+
+    <!-- 게시물 존재 여부 확인 -->
+    <select id="existsById" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM POST
+            WHERE post_id = #{postId}
+        )
+    </select>
+
+    <!-- 게시물 수정 -->
+<!--    <update id="updatePostById" parameterType="com.study.simpleboard.dto.PostDto$UpdateRequest">-->
+    <update id="updatePostById" parameterType="map">
+        UPDATE post
+        SET post_title = #{request.title}, post_content = #{request.content}, updated_at = CURRENT_TIMESTAMP
+        WHERE post_id = #{postId}
+    </update>
+
+</mapper>
