@@ -13,6 +13,7 @@ public interface UserMapper { // 기본적인 CRUD 작업
     boolean existsByEmail(String email);
 
     // 회원 조회
+    UserDTO findByEmail(String email);
 
 
     // 로그인 조회

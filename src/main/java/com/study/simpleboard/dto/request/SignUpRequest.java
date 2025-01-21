@@ -9,6 +9,7 @@ import lombok.*;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SignUpRequest {
 
     @NotNull(message = "이름은 필수 입력값입니다.")

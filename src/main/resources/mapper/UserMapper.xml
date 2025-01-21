@@ -40,4 +40,10 @@
             WHERE email = #{email}
     </select>
 
+    <select id="findByEmail" resultType="UserDTO">
+        SELECT id, email, name, cell_phone, is_enabled, created_at, updated_at, login_type
+        FROM users
+        WHERE email = #{email}
+    </select>
+
 </mapper>
