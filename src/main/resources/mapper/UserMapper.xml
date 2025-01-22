@@ -92,4 +92,9 @@
         WHERE user_id = #{userId}
     </update>
 
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM user
+        WHERE user_id = #{userId}
+    </delete>
+
 </mapper>

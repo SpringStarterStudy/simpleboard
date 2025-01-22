@@ -120,5 +120,25 @@ public class UserService {
         userMapper.updatePassword(userId, encodedPassword);
     }
 
+    // 회원 탈퇴
+    public void deleteUser(Long userId, String password) {
+        // 사용자 확인
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        try {
+            userMapper.deleteUser(userId);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.DELETE_USER_FAILED);
+        }
+    }
+
 }
 

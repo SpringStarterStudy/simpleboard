@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
                         .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/password").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login
@@ -49,8 +50,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/api/users/logout")            // 로그아웃 처리 URL
-                        .logoutSuccessHandler(logoutSuccessHandler) // 로그아웃이 되면
+                        .logoutUrl("/api/users/logout")                  // 로그아웃 처리 URL
+                        .logoutSuccessHandler(logoutSuccessHandler)      // 로그아웃이 되면
                         .invalidateHttpSession(true)                     // 세션 무효화
                         .clearAuthentication(true)                       // 인증 정보 제거
                         .deleteCookies("JSESSIONID")   // 세션 쿠키 삭제

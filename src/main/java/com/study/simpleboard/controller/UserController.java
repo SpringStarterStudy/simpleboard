@@ -5,15 +5,14 @@ import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.LoginType;
 import com.study.simpleboard.dto.User;
-import com.study.simpleboard.dto.request.LoginRequest;
-import com.study.simpleboard.dto.request.SignUpRequest;
-import com.study.simpleboard.dto.request.UpdatePasswordRequest;
-import com.study.simpleboard.dto.request.UpdateUserRequest;
+import com.study.simpleboard.dto.request.*;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -96,6 +95,20 @@ public class UserController {
             @PathVariable Long userId, @Valid @RequestBody UpdatePasswordRequest request) {
         try {
             userService.updatePassword(userId, request);
+            return ApiResponse.success(null);
+        } catch (CustomException e) {
+            return ApiResponse.error(e.getErrorCode());
+        }
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/{userId}")
+    public ApiResponse<Void> deleteUser(
+            @PathVariable Long userId, @Valid @RequestBody DeleteUserRequest request,
+            HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        try {
+            userService.deleteUser(userId, request.getPassword());
+            new SecurityContextLogoutHandler().logout(httpRequest, null, null); // 탈퇴 후 자동 로그아웃 처리
             return ApiResponse.success(null);
         } catch (CustomException e) {
             return ApiResponse.error(e.getErrorCode());

@@ -32,5 +32,5 @@ public interface UserMapper { // 기본적인 CRUD 작업
     void updatePassword(@Param("userId") Long userId, @Param("password") String password);
 
     // 회원 탈퇴
-
+    void deleteUser(Long userId);
 }
