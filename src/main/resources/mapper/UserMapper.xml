@@ -85,4 +85,11 @@
         )
     </select>
 
+    <update id="updatePassword">
+        UPDATE user
+        SET password = #{password},
+        updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
 </mapper>

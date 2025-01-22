@@ -29,6 +29,7 @@ public interface UserMapper { // 기본적인 CRUD 작업
     boolean existsByNameAndNotId(@Param("name") String name, @Param("userId") Long userId);
 
     // 회원 비밀번호 수정
+    void updatePassword(@Param("userId") Long userId, @Param("password") String password);
 
     // 회원 탈퇴
 

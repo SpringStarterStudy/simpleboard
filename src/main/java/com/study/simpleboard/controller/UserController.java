@@ -7,6 +7,7 @@ import com.study.simpleboard.dto.LoginType;
 import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.request.SignUpRequest;
+import com.study.simpleboard.dto.request.UpdatePasswordRequest;
 import com.study.simpleboard.dto.request.UpdateUserRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.service.UserService;
@@ -78,13 +79,24 @@ public class UserController {
     }
 
     // 정보 수정
-    @PutMapping("/{userId}")
+    @PatchMapping("/{userId}")
     public ApiResponse<User> updateUser(
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest request) {
         try {
             User updatedUser = userService.updateUser(userId, request);
             return ApiResponse.success(updatedUser);
+        } catch (CustomException e) {
+            return ApiResponse.error(e.getErrorCode());
+        }
+    }
+
+    // 비밀번호 수정
+    @PatchMapping("/{userId}/password")
+    public ApiResponse<Void> updatePassword(
+            @PathVariable Long userId, @Valid @RequestBody UpdatePasswordRequest request) {
+        try {
+            userService.updatePassword(userId, request);
+            return ApiResponse.success(null);
         } catch (CustomException e) {
             return ApiResponse.error(e.getErrorCode());
         }

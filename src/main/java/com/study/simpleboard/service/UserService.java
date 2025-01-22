@@ -4,6 +4,7 @@ import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
+import com.study.simpleboard.dto.request.UpdatePasswordRequest;
 import com.study.simpleboard.dto.request.UpdateUserRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.mapper.UserMapper;
@@ -90,6 +91,33 @@ public class UserService {
 
         userMapper.updateUser(user);
         return userMapper.findById(userId);
+    }
+
+    // 비밀번호 수정
+    public void updatePassword(Long userId, UpdatePasswordRequest request) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 새 비밀번호와 확인 비밀번호가 일치하지 않으면
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 새 비밀번호가 현재 비밀번호와 같다면
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.SAME_AS_OLD_PASSWORD);
+        }
+
+        // 새 비밀번호 암호화 후 유저 정보에 업데이트
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        userMapper.updatePassword(userId, encodedPassword);
     }
 
 }
