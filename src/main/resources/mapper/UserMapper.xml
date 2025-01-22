@@ -4,7 +4,7 @@
 <mapper namespace="com.study.simpleboard.mapper.UserMapper">
 
     <!-- 회원 가입 -->
-    <insert id="insertUser" parameterType="com.study.simpleboard.dto.UserDTO" useGeneratedKeys="true" keyProperty="userId">
+    <insert id="insertUser" parameterType="com.study.simpleboard.dto.User" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO user (
             name,
             email,
@@ -40,7 +40,7 @@
             WHERE email = #{email}
     </select>
 
-    <select id="findByEmail" parameterType="string" resultType="com.study.simpleboard.dto.UserDTO">
+    <select id="findByEmail" parameterType="string" resultType="com.study.simpleboard.dto.User">
         SELECT
             id,
             email,
@@ -52,6 +52,20 @@
             login_type
         FROM user
         WHERE email = #{email}
+    </select>
+
+    <select id="findById" parameterType="long" resultType="com.study.simpleboard.dto.User">
+        SELECT
+            user_id,
+            name,
+            email,
+            cell_phone,
+            is_enabled,
+            created_at,
+            updated_at,
+            login_type
+        FROM user
+        WHERE user_id = #{userId}
     </select>
 
 </mapper>

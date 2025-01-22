@@ -2,7 +2,7 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
-import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.mapper.UserMapper;
@@ -20,7 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화를 위한 인코더
 
     // 회원 가입
-    public UserDTO signUp(UserDTO userDTO) {
+    public User signUp(User userDTO) {
         // 중복 체크
         if (userMapper.existsByName(userDTO.getName())) {
             throw new CustomException(ErrorCode.DUPLICATE_NAME);
@@ -36,7 +36,7 @@ public class UserService {
         try {
             userMapper.insertUser(userDTO); // DB에 회원 정보 저장
 
-            UserDTO savedUser = userMapper.findByEmail(userDTO.getEmail()); // 저장된 사용자 정보 조회 (비밀번호는 제외)
+            User savedUser = userMapper.findByEmail(userDTO.getEmail()); // 저장된 사용자 정보 조회 (비밀번호는 제외)
             return savedUser;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.SIGNUP_FAILED);
@@ -45,7 +45,7 @@ public class UserService {
 
     // 회원 로그인
     public LoginResponse login(LoginRequest loginRequest) {
-        UserDTO user = userMapper.findByEmail(loginRequest.getEmail()); // 이메일로 사용자 조회
+        User user = userMapper.findByEmail(loginRequest.getEmail()); // 이메일로 사용자 조회
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -60,6 +60,16 @@ public class UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .build();
+    }
+
+    // 단일 회원 조회
+    public User findById(Long userId) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        user.setPassword(null); // 보안을 위해 비밀번호는 포함 안하기
+        return user;
     }
 
 }

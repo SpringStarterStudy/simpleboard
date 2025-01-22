@@ -2,7 +2,7 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
-import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +36,7 @@ class UserServiceTest {
     @DisplayName("회원가입을 한다.")
     void signUp() {
         // given
-        UserDTO userDTO = UserDTO.builder()
+        User userDTO = User.builder()
                 .email("test@test.com")
                 .password("password123")
                 .name("홍길동")
@@ -49,7 +49,7 @@ class UserServiceTest {
         when(userMapper.findByEmail(userDTO.getEmail())).thenReturn(userDTO);
 
         // when
-        UserDTO result = userService.signUp(userDTO);
+        User result = userService.signUp(userDTO);
 
         // then
         assertThat(result).isNotNull();
@@ -61,7 +61,7 @@ class UserServiceTest {
     @DisplayName("중복된 이메일은 회원가입을 할 수 없다.")
     void existedEmail() {
         // given
-        UserDTO userDTO = UserDTO.builder()
+        User userDTO = User.builder()
                 .email("existing@test.com")
                 .password("password123")
                 .name("홍길동")

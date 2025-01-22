@@ -1,37 +1,25 @@
 package com.study.simpleboard.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.LoginType;
-import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.SignUpRequest;
 import com.study.simpleboard.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
-import java.util.concurrent.locks.StampedLock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserControllerTest {
 
@@ -60,7 +48,7 @@ class UserControllerTest {
         request.setName("테스트");
         request.setCellPhone("01012345678");
 
-        UserDTO expectedUser = UserDTO.builder()
+        User expectedUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
                 .cellPhone(request.getCellPhone())
@@ -68,10 +56,10 @@ class UserControllerTest {
                 .loginType(LoginType.LOCAL)
                 .build();
 
-        when(userService.signUp(any(UserDTO.class))).thenReturn(expectedUser);
+        when(userService.signUp(any(User.class))).thenReturn(expectedUser);
 
         // when
-        ApiResponse<UserDTO> response = userController.signUp(request);
+        ApiResponse<User> response = userController.signUp(request);
 
         // then
         assertThat(response.getStatus()).isEqualTo(200);

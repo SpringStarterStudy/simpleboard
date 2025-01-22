@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +16,7 @@ class UserDTOTest {
         LocalDateTime now = LocalDateTime.now();
 
         // when
-        UserDTO userDTO = UserDTO.builder()
+        User userDTO = User.builder()
                 .userId(1L)
                 .name("test_유저")
                 .email("test@test.com")

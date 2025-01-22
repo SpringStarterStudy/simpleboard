@@ -4,7 +4,7 @@ import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.LoginType;
-import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.request.SignUpRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
@@ -12,10 +12,7 @@ import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -27,9 +24,9 @@ public class UserController {
 
     // 회원 가입
     @PostMapping("/signup")
-    public ApiResponse<UserDTO> signUp(@Valid @RequestBody SignUpRequest request) {
+    public ApiResponse<User> signUp(@Valid @RequestBody SignUpRequest request) {
         try {
-            UserDTO userDTO = UserDTO.builder()
+            User userDTO = User.builder()
                     .email(request.getEmail())
                     .password(request.getPassword())
                     .name(request.getName())
@@ -40,7 +37,7 @@ public class UserController {
                     .loginType(LoginType.LOCAL) // 일반 회원가입의 경우 LOCAL로 설정
                     .build();
 
-            UserDTO createdUser = userService.signUp(userDTO);
+            User createdUser = userService.signUp(userDTO);
             return ApiResponse.success(createdUser);
         } catch (CustomException e) {
             return ApiResponse.error(e.getErrorCode());
@@ -65,6 +62,17 @@ public class UserController {
             return ApiResponse.success(null); // SecurityConfig에서 처리되므로 여기에서는 성공 응답만 반환하기
         } catch (Exception e) {
             return ApiResponse.error(ErrorCode.LOGOUT_FAILED);
+        }
+    }
+
+    // 단일 조회
+    @GetMapping("/{userId}")
+    public ApiResponse<User> findById(@PathVariable Long userId) {
+        try {
+            User user = userService.findById(userId);
+            return ApiResponse.success(user);
+        } catch (CustomException e) {
+            return ApiResponse.error(e.getErrorCode());
         }
     }
 
