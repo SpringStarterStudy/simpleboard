@@ -10,12 +10,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final UserService userService;
+    private final AuthenticationSuccessHandler authSuccessHandler;
+    private final AuthenticationFailureHandler authFailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -26,18 +29,21 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/api/users/login")
-                        .defaultSuccessUrl("/")
-                        .permitAll() // 모두 공개 접근
+                        .loginProcessingUrl("/api/users/login")    // 로그인 처리 URL
+                        .usernameParameter("email")                // 로그인 시 사용할 이메일 파라미터 이름
+                        .passwordParameter("password")             // 로그인 시 사용할 비밀번호 파라미터 이름
+                        .successHandler(authSuccessHandler)        // 로그인 성공 시 처리를 위한 핸들러
+                        .failureHandler(authFailureHandler)        // 로그인 실패 시 처리를 위한 핸들러
+                        .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true) // 로그아웃 시 세션 무효
+                        .invalidateHttpSession(true)             // 로그아웃 시 세션 무효
                 )
-                .sessionManagement(session -> session
+                .sessionManagement(session -> session // 세션 방식 사용
                         .maximumSessions(1)                      // 동시 접속 제한. 한 계정당 최대 1개의 세션만 허용!
                         .maxSessionsPreventsLogin(false)         // 동일 계정으로 새로운 로그인 시도 시 기존 세션 만료(false)
+                        .expiredUrl("/")                         // 세션 만료시 이동할 URL
                 );
 
         return http.build();

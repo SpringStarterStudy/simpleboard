@@ -5,7 +5,9 @@ import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.LoginType;
 import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.request.SignUpRequest;
+import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,17 @@ public class UserController {
 
             UserDTO createdUser = userService.signUp(userDTO);
             return ApiResponse.success(createdUser);
+        } catch (CustomException e) {
+            return ApiResponse.error(e.getErrorCode());
+        }
+    }
+
+    // 로그인
+    @PostMapping("/login")
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            LoginResponse loginResponse = userService.login(request);
+            return ApiResponse.success(loginResponse);
         } catch (CustomException e) {
             return ApiResponse.error(e.getErrorCode());
         }

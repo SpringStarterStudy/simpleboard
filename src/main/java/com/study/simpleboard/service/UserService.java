@@ -3,6 +3,8 @@ package com.study.simpleboard.service;
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.UserDTO;
+import com.study.simpleboard.dto.request.LoginRequest;
+import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,25 @@ public class UserService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.SIGNUP_FAILED);
         }
+    }
+
+    // 회원 로그인
+    public LoginResponse login(LoginRequest loginRequest) {
+        UserDTO user = userMapper.findByEmail(loginRequest.getEmail()); // 이메일로 사용자 조회
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) { // 비밀번호 검증
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        // 비밀번호는 포함하지 않고 반환
+        return LoginResponse.builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
     }
 
 }
