@@ -1,9 +1,13 @@
 package com.study.simpleboard.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.simpleboard.config.handler.LogoutSuccessHandler;
 import com.study.simpleboard.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,12 +17,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final AuthenticationFailureHandler authFailureHandler;
+    private final LogoutSuccessHandler logoutSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,8 +45,11 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true)             // 로그아웃 시 세션 무효
+                        .logoutUrl("/api/users/logout")            // 로그아웃 처리 URL
+                        .logoutSuccessHandler(logoutSuccessHandler) // 로그아웃이 되면
+                        .invalidateHttpSession(true)                     // 세션 무효화
+                        .clearAuthentication(true)                       // 인증 정보 제거
+                        .deleteCookies("JSESSIONID")   // 세션 쿠키 삭제
                 )
                 .sessionManagement(session -> session // 세션 방식 사용
                         .maximumSessions(1)                      // 동시 접속 제한. 한 계정당 최대 1개의 세션만 허용!

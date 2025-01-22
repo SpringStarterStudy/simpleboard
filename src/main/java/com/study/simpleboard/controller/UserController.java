@@ -9,6 +9,7 @@ import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.request.SignUpRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,5 +58,14 @@ public class UserController {
         }
     }
 
+    // 로그아웃
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(HttpServletRequest request) {
+        try {
+            return ApiResponse.success(null); // SecurityConfig에서 처리되므로 여기에서는 성공 응답만 반환하기
+        } catch (Exception e) {
+            return ApiResponse.error(ErrorCode.LOGOUT_FAILED);
+        }
+    }
 
 }
