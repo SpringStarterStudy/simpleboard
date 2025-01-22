@@ -7,6 +7,7 @@ import com.study.simpleboard.dto.LoginType;
 import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
 import com.study.simpleboard.dto.request.SignUpRequest;
+import com.study.simpleboard.dto.request.UpdateUserRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -71,6 +72,19 @@ public class UserController {
         try {
             User user = userService.findById(userId);
             return ApiResponse.success(user);
+        } catch (CustomException e) {
+            return ApiResponse.error(e.getErrorCode());
+        }
+    }
+
+    // 정보 수정
+    @PutMapping("/{userId}")
+    public ApiResponse<User> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserRequest request) {
+        try {
+            User updatedUser = userService.updateUser(userId, request);
+            return ApiResponse.success(updatedUser);
         } catch (CustomException e) {
             return ApiResponse.error(e.getErrorCode());
         }

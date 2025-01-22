@@ -6,6 +6,7 @@ import com.study.simpleboard.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/api/users/signup", "/api/users/login").permitAll() // 누구나 접근 가능
                         .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login

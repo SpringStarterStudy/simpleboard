@@ -4,6 +4,7 @@ import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.LoginRequest;
+import com.study.simpleboard.dto.request.UpdateUserRequest;
 import com.study.simpleboard.dto.response.LoginResponse;
 import com.study.simpleboard.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,25 @@ public class UserService {
         }
         user.setPassword(null); // 보안을 위해 비밀번호는 포함 안하기
         return user;
+    }
+
+    // 정보 수정
+    public User updateUser(Long userId, UpdateUserRequest request) {
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        // 이름 중복 체크 (이미 있는 이름인지)
+        if (userMapper.existsByNameAndNotId(request.getName(), userId)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NAME);
+        }
+
+        user.setName(request.getName());
+        user.setCellPhone(request.getCellPhone());
+
+        userMapper.updateUser(user);
+        return userMapper.findById(userId);
     }
 
 }

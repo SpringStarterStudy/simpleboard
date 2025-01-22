@@ -68,4 +68,21 @@
         WHERE user_id = #{userId}
     </select>
 
+    <update id="updateUser" parameterType="com.study.simpleboard.dto.User">
+        UPDATE user
+        SET name = #{name},
+        cell_phone = #{cellPhone},
+        updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="existsByNameAndNotId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM user
+            WHERE name = #{name}
+            AND user_id != #{userId}
+        )
+    </select>
+
 </mapper>
