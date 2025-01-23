@@ -1,12 +1,8 @@
 package com.study.simpleboard.controller;
 
-import com.study.simpleboard.common.exception.CustomException;
-import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.common.response.ApiResponse;
-import com.study.simpleboard.dto.LoginType;
-import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.*;
-import com.study.simpleboard.dto.response.LoginResponse;
+import com.study.simpleboard.dto.response.UserResponse;
 import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,94 +20,55 @@ public class UserController {
 
     // 회원 가입
     @PostMapping("/signup")
-    public ApiResponse<User> signUp(@Valid @RequestBody SignUpRequest request) {
-        try {
-            User userDTO = User.builder()
-                    .email(request.getEmail())
-                    .password(request.getPassword())
-                    .name(request.getName())
-                    .cellPhone(request.getCellPhone())
-                    .isEnabled(true) // 기본값
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .loginType(LoginType.LOCAL) // 일반 회원가입의 경우 LOCAL로 설정
-                    .build();
-
-            User createdUser = userService.signUp(userDTO);
-            return ApiResponse.success(createdUser);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+    public ApiResponse<UserResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
+        UserResponse createdUser = userService.signUp(signUpRequest);
+        return ApiResponse.success(createdUser);
     }
 
     // 로그인
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            LoginResponse loginResponse = userService.login(request);
-            return ApiResponse.success(loginResponse);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+    public ApiResponse<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        UserResponse userResponse = userService.login(loginRequest);
+        return ApiResponse.success(userResponse);
     }
 
     // 로그아웃
     @PostMapping("/logout")
     public ApiResponse<Void> logout(HttpServletRequest request) {
-        try {
-            return ApiResponse.success(null); // SecurityConfig에서 처리되므로 여기에서는 성공 응답만 반환하기
-        } catch (Exception e) {
-            return ApiResponse.error(ErrorCode.LOGOUT_FAILED);
-        }
+        return ApiResponse.success(null); // SecurityConfig에서 처리
     }
 
-    // 단일 조회
+    // 단일 정보 조회
     @GetMapping("/{userId}")
-    public ApiResponse<User> findById(@PathVariable Long userId) {
-        try {
-            User user = userService.findById(userId);
-            return ApiResponse.success(user);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+    public ApiResponse<UserResponse> findById(@PathVariable Long userId) {
+        UserResponse userResponse = userService.findById(userId);
+        return ApiResponse.success(userResponse);
     }
 
     // 정보 수정
     @PatchMapping("/{userId}")
-    public ApiResponse<User> updateUser(
-            @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest request) {
-        try {
-            User updatedUser = userService.updateUser(userId, request);
-            return ApiResponse.success(updatedUser);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+    public ApiResponse<UserResponse> updateUser(
+            @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        UserResponse userResponse = userService.updateUser(userId, updateUserRequest);
+        return ApiResponse.success(userResponse);
     }
 
     // 비밀번호 수정
     @PatchMapping("/{userId}/password")
     public ApiResponse<Void> updatePassword(
-            @PathVariable Long userId, @Valid @RequestBody UpdatePasswordRequest request) {
-        try {
-            userService.updatePassword(userId, request);
-            return ApiResponse.success(null);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+            @PathVariable Long userId, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        userService.updatePassword(userId, updatePasswordRequest);
+        return ApiResponse.success(null);
     }
 
     // 회원 탈퇴
     @DeleteMapping("/{userId}")
     public ApiResponse<Void> deleteUser(
-            @PathVariable Long userId, @Valid @RequestBody DeleteUserRequest request,
+            @PathVariable Long userId, @Valid @RequestBody DeleteUserRequest deleteUserRequest,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        try {
-            userService.deleteUser(userId, request.getPassword());
-            new SecurityContextLogoutHandler().logout(httpRequest, null, null); // 탈퇴 후 자동 로그아웃 처리
-            return ApiResponse.success(null);
-        } catch (CustomException e) {
-            return ApiResponse.error(e.getErrorCode());
-        }
+        userService.deleteUser(userId, deleteUserRequest.getPassword());
+        new SecurityContextLogoutHandler().logout(httpRequest, null, null); // 탈퇴 후 자동 로그아웃 처리
+        return ApiResponse.success(null);
     }
 
 }
