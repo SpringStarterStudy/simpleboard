@@ -1,11 +1,13 @@
 package com.study.simpleboard.service;
 
+import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.repository.PostReactionRepository;
+import com.study.simpleboard.service.exception.InvalidReactionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,14 +67,15 @@ public class PostReactionService {
 
     // 입력된 값이 like인지 dislike인지 확인 후 알맞은 ReactionType 반환
     private static ReactionType determineReactionType(PostReactionReq postReactionReq) {
+        if ((postReactionReq.getLike() != null && postReactionReq.getDislike() != null) ||
+                (postReactionReq.getDislike() == null && postReactionReq.getLike() == null)) {
+            throw new InvalidReactionException(ErrorCode.INVALID_REACTION);
+        }
         if (postReactionReq.getLike() != null) {
             return ReactionType.LIKE;
-        } else if (postReactionReq.getDislike() != null) {
+        } else {
             return ReactionType.DISLIKE;
         }
-        // TODO: like, dislike 둘 다 null이 아닐 경우(둘 다 데이터가 존재할 경우) 예외 추가
-        //  아래 예외는 임시 (추후에 수정 예정)
-        throw new IllegalArgumentException("like 또는 dislike 데이터가 입력되지 않았습니다");
     }
 
     // 조회된 객체에서 reaction 활성화 상태만 변경한 후 반환
