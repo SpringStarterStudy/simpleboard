@@ -1,7 +1,7 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
-import com.study.simpleboard.domain.ReactionType;
+import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;

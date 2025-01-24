@@ -1,6 +1,6 @@
 package com.study.simpleboard.mapper;
 
-import com.study.simpleboard.domain.ReactionType;
+import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.dto.CommentReactionResponseDTO;
 import org.apache.ibatis.annotations.Mapper;

@@ -1,7 +1,7 @@
 package com.study.simpleboard.dto;
 
-import com.study.simpleboard.domain.ReactionType;
-import com.study.simpleboard.domain.TargetType;
+import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.domain.enums.TargetType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

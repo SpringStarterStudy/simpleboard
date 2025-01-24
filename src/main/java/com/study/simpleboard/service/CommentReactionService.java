@@ -1,6 +1,6 @@
 package com.study.simpleboard.service;
 
-import com.study.simpleboard.domain.ReactionType;
+import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.dto.CommentReactionResponseDTO;
 import com.study.simpleboard.mapper.CommentReactionMapper;
@@ -41,6 +41,7 @@ public class CommentReactionService {
     // 유저 반응 업데이트
     @Transactional
     public void updateCommentReaction(Long userId, Long commentId, CommentReactionRequestDTO inputReactionRequestDTO) {
+        // TODO 댓글이 현재 유효한지 검증
         // 반응 타입까지 포함하여 조회
         CommentReactionResponseDTO existingReaction = commentReactionMapper.findByUserIdCommentIdAndReactionType(
                 userId,
