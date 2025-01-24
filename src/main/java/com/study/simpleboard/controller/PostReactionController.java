@@ -1,7 +1,7 @@
 package com.study.simpleboard.controller;
 
-import com.study.simpleboard.dto.post.PostReactionReq;
-import com.study.simpleboard.dto.post.PostReactionResp;
+import com.study.simpleboard.dto.PostReactionReq;
+import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

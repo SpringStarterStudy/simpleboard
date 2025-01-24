@@ -1,4 +1,4 @@
-package com.study.simpleboard.enums;
+package com.study.simpleboard.domain.enums;
 
 public enum ReactionType {
     LIKE, DISLIKE

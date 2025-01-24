@@ -1,7 +1,7 @@
 package com.study.simpleboard.mapper;
 
-import com.study.simpleboard.enums.ReactionType;
-import com.study.simpleboard.enums.TargetType;
+import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.domain.Reaction;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
