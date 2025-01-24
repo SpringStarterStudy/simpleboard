@@ -41,8 +41,8 @@ public class UserService {
                 .loginType(LoginType.LOCAL)
                 .build();
 
-        User savedUser = userMapper.findByEmail(user.getEmail());
-        return UserResponse.from(savedUser);
+        userMapper.insertUser(user);
+        return UserResponse.from(user);
     }
 
     // 로그인
