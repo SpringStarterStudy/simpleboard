@@ -16,4 +16,20 @@ public class PostReactionReq {
     private final Long userId;
     private final Boolean like;
     private final Boolean dislike;
+
+    public boolean hasLike() {
+        return like != null;
+    }
+
+    public boolean hasDislike() {
+        return dislike != null;
+    }
+
+    public boolean isInvalid() {
+        return !hasLike() && !hasDislike() || hasLike() && hasDislike();
+    }
+
+    public boolean getActive() {
+        return hasLike() ? getLike() : getDislike();
+    }
 }

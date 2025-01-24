@@ -2,6 +2,7 @@ package com.study.simpleboard.domain;
 
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
+import com.study.simpleboard.dto.PostReactionReq;
 import lombok.*;
 
 @Getter
@@ -26,6 +27,16 @@ public class Reaction {
                 .targetType(targetType)
                 .reactionType(reactionType)
                 .active(active)
+                .build();
+    }
+
+    public static Reaction of(Long postId, ReactionType reactionType, PostReactionReq postReactionReq) {
+        return Reaction.builder()
+                .userId(postReactionReq.getUserId())
+                .targetId(postId)
+                .targetType(TargetType.POST)
+                .reactionType(reactionType)
+                .active(postReactionReq.getActive())
                 .build();
     }
 }
