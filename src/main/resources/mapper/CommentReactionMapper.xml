@@ -1,8 +1,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.simpleboard.mapper.CommentReactionMapper">
 
-    <!-- Insert Reaction -->
-    <insert id="insertCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
+    <!-- 새로운 반응 추가 -->
+    <insert id="insertCommentReaction" parameterType="com.study.simpleboard.dto.CommentReactionRequestDTO">
         INSERT INTO reaction (
         user_id,
         target_id,
@@ -12,14 +12,14 @@
         ) VALUES (
         #{userId},
         #{targetId},
-        #{targetType},
+        'COMMENT',
         #{reactionType},
-        #{isActive}
+        true
         )
     </insert>
 
-    <!-- Find Reaction by User ID and Comment ID -->
-    <select id="findAllByUserIdAndCommentId" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
+    <!-- 모든 존재하는 반응 찾기 -->
+    <select id="findAllByUserIdAndCommentId" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionResponseDTO">
         SELECT
         reaction_id,
         user_id,
@@ -33,15 +33,15 @@
     </select>
 
 
-    <!-- Toggle Reaction Status -->
-    <update id="updateReactionStatus" parameterType="com.study.simpleboard.dto.CommentReactionDTO">
+    <!-- 반응 토글하기 -->
+    <update id="updateReactionStatus" parameterType="com.study.simpleboard.dto.CommentReactionRequestDTO">
         UPDATE reaction
         SET is_active = #{isActive}
         WHERE reaction_id = #{reactionId};
     </update>
 
-
-    <select id="findByUserIdCommentIdAndReactionType" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionDTO">
+    <!-- 존재하는 반응 찾기 -->
+    <select id="findByUserIdCommentIdAndReactionType" parameterType="map" resultType="com.study.simpleboard.dto.CommentReactionResponseDTO">
         SELECT
         reaction_id,
         user_id,

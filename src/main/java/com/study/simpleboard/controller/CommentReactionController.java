@@ -2,7 +2,7 @@ package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.domain.ReactionType;
-import com.study.simpleboard.dto.CommentReactionDTO;
+import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.service.CommentReactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +20,11 @@ public class CommentReactionController {
     @PostMapping("comments/{commentId}/reaction")
     public ApiResponse<Void> handleReaction(
             @PathVariable Long commentId,
-            @RequestBody CommentReactionDTO inputReactionDTO) {
+            @RequestBody CommentReactionRequestDTO inputReactionRequestDTO) {
         commentReactionService.updateCommentReaction(
-                inputReactionDTO.userId(),
+                inputReactionRequestDTO.getUserId(),
                 commentId,
-                inputReactionDTO);
+                inputReactionRequestDTO);
         return ApiResponse.success("Reaction processed successfully!");
     }
 
