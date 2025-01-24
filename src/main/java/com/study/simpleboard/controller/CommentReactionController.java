@@ -13,8 +13,12 @@ import java.util.Map;
 @RequestMapping("/api")
 public class CommentReactionController {
 
-    @Autowired
-    private CommentReactionService commentReactionService;
+    private final CommentReactionService commentReactionService;
+
+    public CommentReactionController(CommentReactionService commentReactionService) {
+        this.commentReactionService = commentReactionService;
+    }
+
 
     // 댓글 반응 업데이트
     @PostMapping("comments/{commentId}/reaction")
