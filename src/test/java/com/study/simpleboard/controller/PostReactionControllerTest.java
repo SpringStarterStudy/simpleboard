@@ -1,8 +1,8 @@
 package com.study.simpleboard.controller;
 
 import com.google.gson.Gson;
-import com.study.simpleboard.dto.post.PostReactionReq;
-import com.study.simpleboard.dto.post.PostReactionResp;
+import com.study.simpleboard.dto.PostReactionReq;
+import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

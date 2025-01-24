@@ -1,8 +1,8 @@
 package com.study.simpleboard.repository;
 
-import com.study.simpleboard.enums.ReactionType;
-import com.study.simpleboard.enums.TargetType;
-import com.study.simpleboard.dto.post.PostReactionReq;
+import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.domain.enums.TargetType;
+import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.mapper.ReactionMapper;
 import lombok.RequiredArgsConstructor;

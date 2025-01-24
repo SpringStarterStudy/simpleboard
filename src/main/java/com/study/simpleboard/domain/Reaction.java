@@ -1,7 +1,7 @@
 package com.study.simpleboard.domain;
 
-import com.study.simpleboard.enums.ReactionType;
-import com.study.simpleboard.enums.TargetType;
+import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.domain.enums.TargetType;
 import lombok.*;
 
 @Getter

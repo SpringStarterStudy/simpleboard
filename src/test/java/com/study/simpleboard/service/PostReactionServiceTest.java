@@ -1,10 +1,10 @@
 package com.study.simpleboard.service;
 
 import com.study.simpleboard.domain.Reaction;
-import com.study.simpleboard.dto.post.PostReactionReq;
-import com.study.simpleboard.dto.post.PostReactionResp;
-import com.study.simpleboard.enums.ReactionType;
-import com.study.simpleboard.enums.TargetType;
+import com.study.simpleboard.dto.PostReactionReq;
+import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.repository.PostReactionRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.study.simpleboard.dto.post;
+package com.study.simpleboard.dto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
