@@ -2,7 +2,6 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.enums.ReactionType;
-import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.Reaction;
@@ -45,7 +44,7 @@ public class PostReactionService {
     @Transactional
     public void saveReactionRequest(Long postId, PostReactionReq postReactionReq) {
         // TODO: 유효한 postId인지 post 테이블에서 조회한 후, 존재하지 않는 경우 예외 처리 추가
-        ReactionType reactionType = determineReactionType(postReactionReq);
+        ReactionType reactionType = getReactionType(postReactionReq);
         Optional<Reaction> postReaction = findReaction(postId, postReactionReq, reactionType);
         postReaction.ifPresentOrElse(
                 reaction -> updateReaction(postReactionReq, reaction),
@@ -62,42 +61,19 @@ public class PostReactionService {
     }
 
     private void saveReaction(Long postId, PostReactionReq postReactionReq) {
-        postReactionRepository.save(createReaction(postId, postReactionReq));
+        postReactionRepository.save(Reaction.of(postId, getReactionType(postReactionReq), postReactionReq));
     }
 
     // 입력된 값이 like인지 dislike인지 확인 후 알맞은 ReactionType 반환
-    private static ReactionType determineReactionType(PostReactionReq postReactionReq) {
-        if ((postReactionReq.getLike() != null && postReactionReq.getDislike() != null) ||
-                (postReactionReq.getDislike() == null && postReactionReq.getLike() == null)) {
+    private static ReactionType getReactionType(PostReactionReq postReactionReq) {
+        if (postReactionReq.isInvalid()) {
             throw new InvalidReactionException(ErrorCode.INVALID_REACTION);
         }
-        if (postReactionReq.getLike() != null) {
-            return ReactionType.LIKE;
-        } else {
-            return ReactionType.DISLIKE;
-        }
+        return postReactionReq.hasLike() ? ReactionType.LIKE : ReactionType.DISLIKE;
     }
 
     // 조회된 객체에서 reaction 활성화 상태만 변경한 후 반환
     private static Reaction getChangedReaction(PostReactionReq postReactionReq, Reaction reaction) {
-        boolean isLike = postReactionReq.getLike() != null;
-        boolean active = isLike ? postReactionReq.getLike() : postReactionReq.getDislike();
-        ReactionType reactionType = isLike ? ReactionType.LIKE : ReactionType.DISLIKE;
-        return reaction.changeActive(reactionType, active);
-    }
-
-    private static Reaction createReaction(Long postId, PostReactionReq postReactionReq) {
-        return Reaction.builder()
-                .userId(postReactionReq.getUserId())
-                .targetId(postId)
-                .targetType(TargetType.POST)
-                .reactionType(determineReactionType(postReactionReq))
-                .active(getActive(postReactionReq))
-                .build();
-    }
-
-    private static boolean getActive(PostReactionReq postReactionReq) {
-        boolean isLike = postReactionReq.getLike() != null;
-        return isLike ? postReactionReq.getLike() : postReactionReq.getDislike();
+        return reaction.changeActive(getReactionType(postReactionReq), postReactionReq.getActive());
     }
 }
