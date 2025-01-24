@@ -21,6 +21,8 @@ public class PostService {
 
     private final PostMapper postMapper;
 
+    private static final int PAGE_GROUP_SIZE = 5;
+
     // 전체 게시물 목록 조회
     @Transactional(readOnly = true)
     public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPosts(
@@ -37,7 +39,7 @@ public class PostService {
                     .postPerPage(pageable.getPageSize())
                     .totalPostsCount(0L)
                     .totalPages(0)
-                    .pageGroupSize(5)
+                    .pageGroupSize(PAGE_GROUP_SIZE)
                     .build();
         }
 
@@ -61,7 +63,7 @@ public class PostService {
                 .postPerPage(postPage.getSize())
                 .totalPostsCount(postPage.getTotalElements())
                 .totalPages(postPage.getTotalPages())
-                .pageGroupSize(5)
+                .pageGroupSize(PAGE_GROUP_SIZE)
                 .build();
     }
 
