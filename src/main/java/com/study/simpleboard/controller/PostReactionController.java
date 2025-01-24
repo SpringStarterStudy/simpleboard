@@ -1,5 +1,6 @@
 package com.study.simpleboard.controller;
 
+import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
@@ -21,11 +22,11 @@ public class PostReactionController {
     // 조회 데이터 없을 시 404 응답
     // 조회 성공 시 200 응답
     @GetMapping("/posts/{postId}/reaction")
-    public ResponseEntity<PostReactionResp> getReaction(@Positive @PathVariable Long postId,
-                                                        @Positive @RequestParam Long userId) {
+    public ApiResponse<PostReactionResp> getReaction(@Positive @PathVariable Long postId,
+                                                     @Positive @RequestParam Long userId) {
         // TODO: 로그인 인증 구현 후 userId 검증 수정
         PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userId);
-        return ResponseEntity.ok(reactionResponse);
+        return ApiResponse.success(reactionResponse);
     }
 
     // like 또는 dislike 활성화 상태에 대한 요청을 받아서 저장한 후 204 응답
