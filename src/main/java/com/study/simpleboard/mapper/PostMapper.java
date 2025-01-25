@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface PostMapper {
 
     // 게시물 상세 조회
-    Optional<PostDto.Detail> selectPostById(Long postId);
+    Optional<PostDto.PostResponse> selectPostById(Long postId);
 
     // 조회수 증가
     void updateViewCount(Long postId);

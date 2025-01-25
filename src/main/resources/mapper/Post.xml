@@ -3,15 +3,15 @@
 <mapper namespace="com.study.simpleboard.mapper.PostMapper">
 
     <!-- 게시물 상세 조회 -->
-    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$Detail">
+    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$PostResponse">
         SELECT
-            post_id AS id,
-            user_id AS userId,
-            post_title AS title,
-            post_content AS content,
-            created_at AS createdAt,
-            updated_at AS updatedAt,
-            view_count AS viewCount
+            post_id,
+            user_id,
+            post_title,
+            post_content,
+            created_at,
+            updated_at,
+            view_count
         FROM post
         WHERE post_id = #{postId}
             AND deleted_at IS NULL
