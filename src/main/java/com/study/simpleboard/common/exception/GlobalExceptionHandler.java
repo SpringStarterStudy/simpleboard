@@ -18,19 +18,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException e) {
         log.error("CustomException: {}", e.getErrorCode().getMessage());
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ApiResponse.error(e.getErrorCode()));
+            .status(e.getErrorCode().getStatus())
+            .body(ApiResponse.error(e.getErrorCode()));
     }
 
     // ValidationException 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<String>> handleValidationException(
-            BindingResult bindingResult) {
+        BindingResult bindingResult) {
         log.error("Validation 예외 발생: {}", bindingResult.getAllErrors());
         return ResponseEntity
-                .status(ErrorCode.VALIDATION_EXCEPTION.getStatus())
-                .body(ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION,
-                        bindingResult.getAllErrors().get(0).getDefaultMessage()));
+            .status(ErrorCode.VALIDATION_EXCEPTION.getStatus())
+            .body(ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION,
+                bindingResult.getAllErrors().get(0).getDefaultMessage()));
     }
 
 

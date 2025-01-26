@@ -1,8 +1,12 @@
 package com.study.simpleboard.service;
 
+import com.study.simpleboard.common.exception.CustomException;
+import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.CommentCreateDTO;
 import com.study.simpleboard.dto.CommentCreateRequestDTO;
+import com.study.simpleboard.dto.CommentResponseDTO;
 import com.study.simpleboard.mapper.CommentMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,4 +24,10 @@ public class CommentService {
             requestDTO.getCommentContent()));
 
     }
+
+    public List<CommentResponseDTO> getCommentList(Long postId) {
+        //TODO postId 유효성 검사
+        return commentMapper.selectCommentList(postId);
+    }
+
 }
