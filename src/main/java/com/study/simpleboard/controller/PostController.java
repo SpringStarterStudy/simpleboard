@@ -23,7 +23,7 @@ public class PostController {
     // 게시물 수정
     @PutMapping("/posts/{postId}")
     public ApiResponse<Void> updatePost(
-            @PathVariable @Positive(message = "게시물 번호는 양수여야 합니다.") Long postId,
+            @PathVariable @Positive(message = "게시물 요청 형식이 올바르지 않습니다.") Long postId,
             @Valid @RequestBody PostDto.UpdateRequest request
     ) {
         postService.updatePost(postId, request);

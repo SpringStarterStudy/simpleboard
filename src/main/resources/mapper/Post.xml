@@ -24,7 +24,7 @@
     <!-- 게시물 수정 -->
     <update id="updatePostById">
         UPDATE post
-        SET post_title = #{post.title}, post_content = #{post.content}, updated_at = CURRENT_TIMESTAMP
+        SET post_title = #{post.title}, post_content = #{post.content}
         WHERE post_id = #{postId}
             AND user_id = #{post.userId}
     </update>
