@@ -109,13 +109,13 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         PostReactionReq mockReq = new PostReactionReq(USER_ID, LIKE_STATUS, null);
         Optional<Reaction> mockReaction = Optional.of(getReaction(ReactionType.LIKE, LIKE_STATUS));
-        when(postReactionRepository.findReaction(POST_ID, mockReq, ReactionType.LIKE)).thenReturn(mockReaction);
+        when(postReactionRepository.findReaction(POST_ID, mockReq.getUserId(), ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
         postReactionService.saveReactionRequest(POST_ID, mockReq);
 
         // Then: Mapper 호출 검증
-        verify(postReactionRepository).findReaction(POST_ID, mockReq, ReactionType.LIKE);
+        verify(postReactionRepository).findReaction(POST_ID, mockReq.getUserId(), ReactionType.LIKE);
         verify(postReactionRepository).updateActive(any(Reaction.class));
     }
 
@@ -128,13 +128,13 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         PostReactionReq mockReq = new PostReactionReq(USER_ID, LIKE_STATUS, null);
         Optional<Reaction> mockReaction = Optional.empty();
-        when(postReactionRepository.findReaction(POST_ID, mockReq, ReactionType.LIKE)).thenReturn(mockReaction);
+        when(postReactionRepository.findReaction(POST_ID, mockReq.getUserId(), ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
         postReactionService.saveReactionRequest(POST_ID, mockReq);
 
         // Then: Mapper 호출 검증
-        verify(postReactionRepository).findReaction(POST_ID, mockReq, ReactionType.LIKE);
+        verify(postReactionRepository).findReaction(POST_ID, mockReq.getUserId(), ReactionType.LIKE);
         verify(postReactionRepository).save(any(Reaction.class));
     }
 
