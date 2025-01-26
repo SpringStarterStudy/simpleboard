@@ -12,4 +12,9 @@ public interface CommentMapper {
 
     List<CommentResponseDTO> selectCommentList(Long postId);
 
+    int checkUser(Long userId, Long commentId);
+
+    int checkCommentId(Long commentId);
+
+    void updateComment(Long commentId, String commentContent);
 }
