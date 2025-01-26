@@ -30,4 +30,17 @@ public class CommentService {
         return commentMapper.selectCommentList(postId);
     }
 
+    @Transactional
+    public void deleteComment(Long userId, Long commentId) {
+        if(commentMapper.checkCommentId(commentId) == 0) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
+        if(commentMapper.checkUser(userId, commentId) == 0) {
+            throw new CustomException(ErrorCode.NO_COMMENT_AUTHORITY);
+        }
+
+        commentMapper.deleteComment(commentId);
+    }
+
 }
