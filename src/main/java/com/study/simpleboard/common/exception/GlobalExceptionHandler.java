@@ -1,6 +1,7 @@
 package com.study.simpleboard.common.exception;
 
 import com.study.simpleboard.common.response.ApiResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,15 +40,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<String>> handleConstraintViolationException(ConstraintViolationException ex) {
         String errorMessage = ex.getConstraintViolations().stream()
-                .map(violation -> {
-                    String fullPath = violation.getPropertyPath().toString();
-                    String field = fullPath.substring(fullPath.lastIndexOf(".") + 1); // 필드명만 추출
-                    log.error("Validation 예외 발생 {}: {}", fullPath, violation.getMessage());
-                    return field + ": " + violation.getMessage();
-                })
+                .map(this::formatViolationMessage)
                 .collect(Collectors.joining(", "));
-
+        log.error("Validation 예외 발생: {}", errorMessage);
         return ResponseEntity.badRequest().body(
                 ApiResponse.error(ErrorCode.VALIDATION_EXCEPTION, errorMessage));
+    }
+
+    private String formatViolationMessage(ConstraintViolation<?> violation) {
+        String fullPath = violation.getPropertyPath().toString();
+        String field = fullPath.substring(fullPath.lastIndexOf(".") + 1); // 필드명만 추출
+        return field + ": " + violation.getMessage();
     }
 }
