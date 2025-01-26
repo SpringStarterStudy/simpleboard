@@ -24,8 +24,8 @@ public class PostReactionRepository {
 
     // 게시글 id, 사용자 id, reactionType을 가지고,
     // like 또는 dislike 데이터 단건 조회
-    public Optional<Reaction> findReaction(Long postId, PostReactionReq postReactionReq, ReactionType reactionType) {
-        return reactionMapper.findReaction(postId, postReactionReq.getUserId(), TargetType.POST, reactionType);
+    public Optional<Reaction> findReaction(Long postId, Long userId, ReactionType reactionType) {
+        return reactionMapper.findReaction(postId, userId, TargetType.POST, reactionType);
     }
 
     public Reaction save(Reaction reaction) {

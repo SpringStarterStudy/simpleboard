@@ -53,7 +53,7 @@ public class PostReactionService {
     }
 
     private Optional<Reaction> findReaction(Long postId, PostReactionReq postReactionReq, ReactionType reactionType) {
-        return postReactionRepository.findReaction(postId, postReactionReq, reactionType);
+        return postReactionRepository.findReaction(postId, postReactionReq.getUserId(), reactionType);
     }
 
     private void updateReaction(PostReactionReq postReactionReq, Reaction reaction) {
