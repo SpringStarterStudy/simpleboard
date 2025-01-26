@@ -52,4 +52,5 @@ public class ApiResponse<T> {
     public static ApiResponse<String> error(ErrorCode errorCode, String customMessage) {
         return new ApiResponse<>(errorCode.getStatus(), errorCode.getCode(), customMessage);
     }
+
 }
