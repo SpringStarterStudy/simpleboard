@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PostReactionControllerTest {
     private final static Long USER_ID = 1L;
     private final static Long POST_ID = 15L;
+    private final static Gson gson = new Gson();
 
     @Mock
     private PostReactionService postReactionService;
@@ -61,7 +62,7 @@ class PostReactionControllerTest {
                 .andExpect(jsonPath("$.dislike").exists()) // "dislike" 필드 존재 확인
                 .andExpect(jsonPath("$.dislike.active").value(false)) // "dislike.active" 값 확인
                 .andReturn();
-        PostReactionResp response = gson().fromJson(mvcResult.getResponse().getContentAsString(), PostReactionResp.class);
+        PostReactionResp response = gson.fromJson(mvcResult.getResponse().getContentAsString(), PostReactionResp.class);
         assertThat(response).isEqualTo(mockResponse);
         verify(postReactionService).getReactionResponse(POST_ID, USER_ID);
     }
@@ -76,16 +77,12 @@ class PostReactionControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/posts/{postId}/reaction", POST_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson().toJson(mockRequest))
+                        .content(gson.toJson(mockRequest))
         );
 
         // Then
         resultActions.andExpect(status().isNoContent());
         verify(postReactionService).saveReactionRequest(POST_ID, mockRequest);
-    }
-
-    private Gson gson() {
-        return new Gson();
     }
 
     private PostReactionReq getRequest() {
