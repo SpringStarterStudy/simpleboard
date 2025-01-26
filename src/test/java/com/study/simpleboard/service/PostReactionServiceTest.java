@@ -1,11 +1,13 @@
 package com.study.simpleboard.service;
 
+import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.repository.PostReactionRepository;
+import com.study.simpleboard.service.exception.InvalidReactionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -34,7 +37,7 @@ class PostReactionServiceTest {
     @InjectMocks
     private PostReactionService postReactionService;
 
-    @DisplayName("like, dislike 활성화 상태 조회 - like와 display 둘 다 존재할 경우")
+    @DisplayName("like, dislike 활성화 상태 조회 - like와 dislike 둘 다 존재할 경우")
     @Test
     void getReactionResponse_withLikeAndDislike_returnsList() {
         // 조건: "like, dislike 상태가 둘 다 존재할 경우"
@@ -138,7 +141,44 @@ class PostReactionServiceTest {
         verify(postReactionRepository).save(any(Reaction.class));
     }
 
-    // TODO: 예외처리 관련 테스트 코드는 나중에 추가 예정
+    @DisplayName("like 또는 dislike 활성화 상태 갱신 - like와 dislike가 둘 다 null일 경우")
+    @Test
+    void saveReactionRequest_whenLikeAndDislikeIsNull_shouldThrowException() {
+        // 조건: "like와 dislike가 둘 다 null일 경우"
+        // 기대 결과: "throw InvalidReactionException"
+
+        // Given: Mock 데이터 정의
+        PostReactionReq mockReq = new PostReactionReq(USER_ID, null, null);
+
+        // When: Service 메서드 호출
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, mockReq))
+                .isInstanceOf(InvalidReactionException.class)
+                .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);
+
+        verify(postReactionRepository,times(0)).findReaction(anyLong(), anyLong(), any(ReactionType.class));
+    }
+
+    @DisplayName("like 또는 dislike 활성화 상태 갱신 - like와 dislike의 데이터가 둘 다 존재할 경우")
+    @Test
+    void saveReactionRequest_whenLikeAndDislikeExist_shouldThrowException() {
+        // 조건: "like와 dislike의 데이터가 둘 다 존재할 경우"
+        // 기대 결과: "throw InvalidReactionException"
+
+        // Given: Mock 데이터 정의
+        PostReactionReq mockReq = new PostReactionReq(USER_ID, LIKE_STATUS, DISLIKE_STATUS);
+
+        // When: Service 메서드 호출
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, mockReq))
+                .isInstanceOf(InvalidReactionException.class)
+                .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);
+
+        verify(postReactionRepository,times(0)).findReaction(anyLong(), anyLong(), any(ReactionType.class));
+    }
+
+    // TODO: userId 검증 테스트 코드 추가
+    //  postId 검증 테스트 추가
 
     private static Reaction getReaction(ReactionType reactionType, boolean active) {
         Reaction reaction = Reaction.builder()

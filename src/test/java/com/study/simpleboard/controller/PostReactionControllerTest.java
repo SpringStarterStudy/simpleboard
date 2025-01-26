@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.lang.reflect.Method;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,8 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class PostReactionControllerTest {
-    private final static Long USER_ID = 1L;
-    private final static Long POST_ID = 15L;
+    private final static long USER_ID = 1L;
+    private final static long POST_ID = 15L;
     private final static Gson gson = new Gson();
 
     @Mock
@@ -36,10 +42,12 @@ class PostReactionControllerTest {
     @InjectMocks
     private PostReactionController postReactionController;
     private MockMvc mockMvc;
+    private Validator validator;
 
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders.standaloneSetup(postReactionController).build();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @DisplayName("like, dislike 활성화 여부 조회")
@@ -83,6 +91,24 @@ class PostReactionControllerTest {
         // Then
         resultActions.andExpect(status().isNoContent());
         verify(postReactionService).saveReactionRequest(POST_ID, mockRequest);
+    }
+
+    @DisplayName("like, dislike 활성화 여부 조회 - postId가 양수가 아닐 경우")
+    @Test
+    void getReaction_whenPostIdIsNotPositive_shouldThrowException() throws Exception {
+        // given
+        long invalidPostId = 0L;
+
+        // when
+        Method getReaction = PostReactionController.class.getMethod("getReaction", Long.class, Long.class);
+        Long[] parameterValues = { invalidPostId, USER_ID };
+        Set<ConstraintViolation<PostReactionController>> violations = validator.forExecutables()
+                .validateParameters(
+                        new PostReactionController(postReactionService), getReaction, parameterValues);
+
+        // then
+        assertThat(violations).isNotEmpty();    // 예외 발생
+        assertThat(violations).anyMatch(violation -> violation.getMessage().contains("0보다 커야 합니다"));
     }
 
     private PostReactionReq getRequest() {
