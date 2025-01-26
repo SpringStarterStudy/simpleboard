@@ -17,13 +17,16 @@
   <select id="checkUser" resultType="int">
     SELECT COUNT(*)
     FROM comment
-    WHERE comment_id = #{commentId} AND user_id = #{userId}
+    WHERE comment_id = #{commentId}
+      AND user_id = #{userId}
+      AND deleted_at IS NULL
   </select>
 
   <select id="checkCommentId" resultType="int">
     SELECT COUNT(*)
     FROM comment
     WHERE comment_id = #{commentId}
+      AND deleted_at IS NULL
   </select>
 
   <update id="updateComment">
