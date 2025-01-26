@@ -1,25 +1,21 @@
 package com.study.simpleboard.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.simpleboard.config.handler.LogoutSuccessHandler;
-import com.study.simpleboard.service.UserService;
+import com.study.simpleboard.service.CustomOAuth2UserService;
+import com.study.simpleboard.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -28,17 +24,21 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final AuthenticationFailureHandler authFailureHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/api/users/signup", "/api/users/login").permitAll() // 누구나 접근 가능
+                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/oauth2/**").permitAll() // 누구나 접근 가능
                         .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}/password").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/{userId}/password").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")
+                        // 경로 추가
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login
@@ -48,6 +48,20 @@ public class SecurityConfig {
                         .successHandler(authSuccessHandler)        // 로그인 성공 시 처리를 위한 핸들러
                         .failureHandler(authFailureHandler)        // 로그인 실패 시 처리를 위한 핸들러
                         .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler((request, response, authentication) -> {
+                            // OAuth2 로그인 성공 시 처리
+                            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+                            response.sendRedirect("/"); // 로그인 성공 시 리다이렉트할 경로
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            // OAuth2 로그인 실패 시 처리
+                            response.sendRedirect("/login?error=true");
+                        })
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/users/logout")                  // 로그아웃 처리 URL
