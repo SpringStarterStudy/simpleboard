@@ -1,6 +1,6 @@
 package com.study.simpleboard.mapper;
 
-import com.study.simpleboard.dto.PostDto;
+import com.study.simpleboard.domain.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,5 +8,6 @@ import org.apache.ibatis.annotations.Param;
 public interface PostMapper {
     // 게시물 수정
     boolean existsById(Long postId);
-    void updatePostById(@Param("postId") Long postId, @Param("request") PostDto.UpdateRequest request);
+    boolean existsByPostIdAndUserId(Long postId, Long userId);
+    void updatePostById(@Param("postId") Long postId, @Param("post") Post post);
 }

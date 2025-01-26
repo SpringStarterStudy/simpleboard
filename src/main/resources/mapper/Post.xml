@@ -8,15 +8,25 @@
             SELECT 1
             FROM POST
             WHERE post_id = #{postId}
-        )
+            )
+    </select>
+
+    <!-- 게시물을 작성한 사용자가 맞는지 확인 -->
+    <select id="existsByPostIdAndUserId" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM post
+            WHERE post_id = #{postId}
+                AND user_id = #{userId}
+            )
     </select>
 
     <!-- 게시물 수정 -->
-<!--    <update id="updatePostById" parameterType="com.study.simpleboard.dto.PostDto$UpdateRequest">-->
-    <update id="updatePostById" parameterType="map">
+    <update id="updatePostById">
         UPDATE post
-        SET post_title = #{request.title}, post_content = #{request.content}, updated_at = CURRENT_TIMESTAMP
+        SET post_title = #{post.title}, post_content = #{post.content}, updated_at = CURRENT_TIMESTAMP
         WHERE post_id = #{postId}
+            AND user_id = #{post.userId}
     </update>
 
 </mapper>

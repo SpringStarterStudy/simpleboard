@@ -8,10 +8,12 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class PostController {
@@ -24,7 +26,6 @@ public class PostController {
             @PathVariable @Positive(message = "게시물 번호는 양수여야 합니다.") Long postId,
             @Valid @RequestBody PostDto.UpdateRequest request
     ) {
-        log.info("updatePost 컨트롤러 실행");
         postService.updatePost(postId, request);
 
         return ApiResponse.success("게시글이 수정되었습니다.");

@@ -2,6 +2,7 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.domain.Post;
 import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +19,17 @@ public class PostService {
 
     @Transactional
     public void updatePost(Long postId, PostDto.UpdateRequest request) {
-        log.info("updatePost 서비스 실행");
-        log.info("postId = " + String.valueOf(postId) + ", title = " + request.getTitle() + ", content = " + request.getContent());
         boolean exists = postMapper.existsById(postId);
         if(!exists) {
             throw new CustomException(ErrorCode.POST_NOT_FOUND);
         }
 
-        // TODO: 사용자 인증 추가해야 함.
+        boolean isAuthor = postMapper.existsByPostIdAndUserId(postId, request.getUserId());
+        if(!isAuthor) {
+            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
+        }
 
-
-
-        postMapper.updatePostById(postId, request);
+        postMapper.updatePostById(postId, Post.update(request));
     }
 
 }

@@ -10,7 +10,9 @@ public class PostDto {
 
     @Getter
     public static class UpdateRequest {
-        @NotNull @Positive private Long userId; // TODO: 사용자 인증
+        @NotNull(message = "유저의 아이디를 입력해주세요.")
+        @Positive(message = "유저 번호는 양수여야 합니다.")
+        private Long userId; // 임시
 
         @NotNull(message = "제목을 입력해주세요.")
         @NotBlank(message = "글자가 포함되어야 합니다.")
