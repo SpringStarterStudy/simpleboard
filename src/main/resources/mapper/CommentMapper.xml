@@ -6,4 +6,12 @@
     INSERT INTO comment ( user_id, post_id, comment_content, created_at )
     VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt})
   </insert>
+
+  <select id="selectCommentList" resultType="com.study.simpleboard.dto.CommentResponseDTO" parameterType="long">
+    SELECT c.comment_id, c.user_id, c.post_id, c.parent_comment_id, c.comment_content, c.created_at
+    FROM comment c
+    WHERE c.post_id = #{postId} AND c.deleted_at IS NULL
+    ORDER BY COALESCE(c.parent_comment_id, c.comment_id), c.created_at ASC
+  </select>
+
 </mapper>
