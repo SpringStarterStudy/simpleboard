@@ -148,10 +148,10 @@ class PostReactionServiceTest {
         // 기대 결과: "throw InvalidReactionException"
 
         // Given: Mock 데이터 정의
-        PostReactionReq mockReq = new PostReactionReq(USER_ID, null, null);
+        PostReactionReq invalidRequest = new PostReactionReq(USER_ID, null, null);
 
         // When: Service 메서드 호출
-        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, mockReq))
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, invalidRequest))
                 .isInstanceOf(InvalidReactionException.class)
                 .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);
@@ -166,10 +166,10 @@ class PostReactionServiceTest {
         // 기대 결과: "throw InvalidReactionException"
 
         // Given: Mock 데이터 정의
-        PostReactionReq mockReq = new PostReactionReq(USER_ID, LIKE_STATUS, DISLIKE_STATUS);
+        PostReactionReq invalidRequest = new PostReactionReq(USER_ID, LIKE_STATUS, DISLIKE_STATUS);
 
         // When: Service 메서드 호출
-        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, mockReq))
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, invalidRequest))
                 .isInstanceOf(InvalidReactionException.class)
                 .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);

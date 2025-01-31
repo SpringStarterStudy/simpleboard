@@ -1,6 +1,8 @@
 package com.study.simpleboard.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -65,13 +68,17 @@ class PostReactionControllerTest {
 
         // Then
         MvcResult mvcResult = resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.like").exists()) // "like" 필드 존재 확인
-                .andExpect(jsonPath("$.like.active").value(true)) // "like.active" 값 확인
-                .andExpect(jsonPath("$.dislike").exists()) // "dislike" 필드 존재 확인
-                .andExpect(jsonPath("$.dislike.active").value(false)) // "dislike.active" 값 확인
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value("success"))
+                .andExpect(jsonPath("$.data.like").exists()) // "like" 필드 존재 확인
+                .andExpect(jsonPath("$.data.like.active").value(true)) // "like.active" 값 확인
+                .andExpect(jsonPath("$.data.dislike").exists()) // "dislike" 필드 존재 확인
+                .andExpect(jsonPath("$.data.dislike.active").value(false)) // "dislike.active" 값 확인
                 .andReturn();
-        PostReactionResp response = gson.fromJson(mvcResult.getResponse().getContentAsString(), PostReactionResp.class);
-        assertThat(response).isEqualTo(mockResponse);
+        ApiResponse<PostReactionResp> response = gson.fromJson(
+                mvcResult.getResponse().getContentAsString(),
+                TypeToken.getParameterized(ApiResponse.class, PostReactionResp.class).getType());
+        assertThat(response.getData()).isEqualTo(mockResponse);
         verify(postReactionService).getReactionResponse(POST_ID, USER_ID);
     }
 
