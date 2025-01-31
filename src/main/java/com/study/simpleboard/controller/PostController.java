@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @Validated
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class PostController {
     // 게시물 삭제
     @DeleteMapping("/posts/{postId}")
     public ApiResponse<Void> deletePost(
-            @PathVariable @Positive(message = "게시물 번호는 양수여야 합니다.") Long postId
+            @PathVariable @Positive(message = "게시물 요청 형식이 올바르지 않습니다.") Long postId
     ) {
         // TODO: 사용자 검증
         postService.deletePost(postId, 1L);
