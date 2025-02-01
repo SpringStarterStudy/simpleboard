@@ -1,7 +1,6 @@
 package com.study.simpleboard.config;
 
 import com.study.simpleboard.config.handler.LogoutSuccessHandler;
-import com.study.simpleboard.service.CustomOAuth2UserService;
 import com.study.simpleboard.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
