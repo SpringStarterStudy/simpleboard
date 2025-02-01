@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성
-@Transactional
 public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화를 위한 인코더
