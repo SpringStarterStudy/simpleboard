@@ -42,9 +42,10 @@
 
     <select id="findByEmail" parameterType="string" resultType="com.study.simpleboard.dto.User">
         SELECT
-            id,
+            user_id,
             email,
             name,
+            password,
             cell_phone,
             is_enabled,
             created_at,
@@ -59,6 +60,7 @@
             user_id,
             name,
             email,
+            password,
             cell_phone,
             is_enabled,
             created_at,
