@@ -46,20 +46,6 @@ public class SecurityConfig {
                         .failureHandler(authFailureHandler)        // 로그인 실패 시 처리를 위한 핸들러
                         .permitAll()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-                        .successHandler((request, response, authentication) -> {
-                            // OAuth2 로그인 성공 시 처리
-                            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-                            response.sendRedirect("/"); // 로그인 성공 시 리다이렉트할 경로
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            // OAuth2 로그인 실패 시 처리
-                            response.sendRedirect("/login?error=true");
-                        })
-                )
                 .logout(logout -> logout
                         .logoutUrl("/api/users/logout")                  // 로그아웃 처리 URL
                         .logoutSuccessHandler(logoutSuccessHandler)      // 로그아웃이 되면
