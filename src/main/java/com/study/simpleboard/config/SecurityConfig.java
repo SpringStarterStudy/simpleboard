@@ -24,7 +24,6 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler authSuccessHandler;
     private final AuthenticationFailureHandler authFailureHandler;
     private final LogoutSuccessHandler logoutSuccessHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
@@ -33,12 +32,10 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/oauth2/**").permitAll() // 누구나 접근 가능
-                        .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
-                        .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/users/{userId}/password").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/users/{userId}").hasAnyRole("USER", "ADMIN")
-                        // 경로 추가
+                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll() // 누구나 접근 가능
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
+                        .requestMatchers("/api/posts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/comments/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login
