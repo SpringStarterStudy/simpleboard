@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +20,8 @@ public class PostController {
 
     // 게시물 상세 조회
     @GetMapping("/posts/{postId}")
-    public ApiResponse<PostDto.PostResponse> getPostById(@PathVariable @Positive Long postId) {
+    public ApiResponse<PostDto.PostResponse> getPostById(
+            @PathVariable @Positive(message = "게시물 요청 형식이 올바르지 않습니다.") Long postId) {
         PostDto.PostResponse response = postService.findPostById(postId);
         postService.incrementViewCountAsync(postId);
 

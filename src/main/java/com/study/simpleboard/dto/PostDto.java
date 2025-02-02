@@ -15,7 +15,6 @@ public class PostDto {
         private String createdAt;
         private String updatedAt;
         private Long viewCount;
-        // TODO : 좋아요, 싫어요
     }
 
 }
