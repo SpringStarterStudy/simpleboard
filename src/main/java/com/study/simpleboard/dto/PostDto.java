@@ -9,6 +9,8 @@ import lombok.*;
 public class PostDto {
 
     @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class UpdateRequest {
         @NotNull(message = "유저의 아이디를 입력해주세요.")
         @Positive(message = "유저 번호는 양수여야 합니다.")
@@ -21,6 +23,7 @@ public class PostDto {
 
         @NotNull(message = "내용을 입력해주세요.")
         @NotBlank(message = "글자가 포함되어야 합니다.")
+        @Size(max = 10000, message = "내용은 10,000자 이내로 입력해주세요.")
         private String content;
     }
 }

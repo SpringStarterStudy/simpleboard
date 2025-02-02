@@ -6,8 +6,9 @@
     <select id="existsById" resultType="boolean">
         SELECT EXISTS(
             SELECT 1
-            FROM POST
+            FROM post
             WHERE post_id = #{postId}
+                AND deleted_at IS NULL
             )
     </select>
 

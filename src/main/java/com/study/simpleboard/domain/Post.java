@@ -1,15 +1,12 @@
 package com.study.simpleboard.domain;
 
 import com.study.simpleboard.dto.PostDto;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class Post {
     private final Long id;
     private final Long userId;
@@ -26,12 +23,11 @@ public class Post {
         this(null, userId, title, content, createdAt, updatedAt, deletedAt, viewCount);
     }
 
-    public static Post update(PostDto.UpdateRequest updateRequest) {
+    public static Post fromUpdateRequest(PostDto.UpdateRequest updateRequest) {
         return Post.builder()
                 .userId(updateRequest.getUserId())
                 .title(updateRequest.getTitle())
                 .content(updateRequest.getContent())
                 .build();
     }
-
 }

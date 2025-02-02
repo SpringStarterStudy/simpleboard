@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PostService {
 
     private final PostMapper postMapper;
@@ -29,7 +28,10 @@ public class PostService {
             throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
         }
 
-        postMapper.updatePostById(postId, Post.update(request));
+        Post post = Post.fromUpdateRequest(request);
+
+        postMapper.updatePostById(postId, Post.fromUpdateRequest(request));
+
     }
 
 }
