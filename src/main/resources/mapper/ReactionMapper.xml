@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.simpleboard.mapper.ReactionMapper">
+    <sql id="baseSelectQuery">
+        select reaction_id as id, user_id, target_id, target_type, reaction_type, is_active as active
+        from reaction
+        where user_id = #{userId}
+            and target_id = #{targetId}
+            and target_type = #{targetType}
+    </sql>
+
+    <select id="findAllReactions" resultType="Reaction">
+        <include refid="baseSelectQuery" />
+    </select>
+
+    <select id="findReaction" resultType="Reaction">
+        <include refid="baseSelectQuery" />
+            and reaction_type = #{reactionType}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into reaction(user_id, target_id, target_type, reaction_type, is_active)
+        values(#{reaction.userId}, #{reaction.targetId}, #{reaction.targetType}, #{reaction.reactionType}, #{reaction.active})
+    </insert>
+
+    <update id="updateActive">
+        update reaction
+        set is_active = #{reaction.active}
+        where user_id = #{reaction.userId}
+            and target_id = #{reaction.targetId}
+            and target_type = #{reaction.targetType}
+            and reaction_type = #{reaction.reactionType}
+    </update>
+
+</mapper>
