@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.study.simpleboard.dto.PostCreateReq;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
@@ -54,7 +57,7 @@ public class PostController {
     }
 
     // 게시물 작성
-    @PostMapping("/api/posts")
+    @PostMapping("/posts")
     public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
         postService.savePost(postCreateReq);
         return ApiResponse.success("게시글이 저장되었습니다.");
