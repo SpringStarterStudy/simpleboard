@@ -29,16 +29,12 @@ public class UserService {
         // 회원 가입 검증
         validateDuplicateUser(signUpRequest.getName(), signUpRequest.getEmail());
 
-        User user = User.builder()
-                .email(signUpRequest.getEmail())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .name(signUpRequest.getName())
-                .cellPhone(signUpRequest.getCellPhone())
-                .isEnabled(true)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .loginType(LoginType.LOCAL)
-                .build();
+        User user = User.createLocalUser(
+                signUpRequest.getEmail(),
+                passwordEncoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getName(),
+                signUpRequest.getCellPhone()
+        );
 
         userMapper.insertUser(user);
         return UserResponse.from(user);

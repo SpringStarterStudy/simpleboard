@@ -20,4 +20,18 @@ public class User {
     private LocalDateTime updatedAt;
     private LoginType loginType;
 
+    // 정적 팩토리 메서드
+    public static User createLocalUser(String email, String encodedPassword, String name, String cellPhone) {
+        return User.builder()
+                .email(email)
+                .password(encodedPassword)
+                .name(name)
+                .cellPhone(cellPhone)
+                .isEnabled(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .loginType(LoginType.LOCAL)
+                .build();
+    }
+
 }
