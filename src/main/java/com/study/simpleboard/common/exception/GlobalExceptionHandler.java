@@ -52,4 +52,5 @@ public class GlobalExceptionHandler {
         String field = fullPath.substring(fullPath.lastIndexOf(".") + 1); // 필드명만 추출
         return field + ": " + violation.getMessage();
     }
+  
 }

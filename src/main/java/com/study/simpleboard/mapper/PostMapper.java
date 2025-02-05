@@ -2,8 +2,8 @@ package com.study.simpleboard.mapper;
 
 import com.study.simpleboard.dto.PostDto;
 import org.apache.ibatis.annotations.Mapper;
+import java.util.Optional;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 @Mapper
@@ -18,5 +18,11 @@ public interface PostMapper {
 
     // 전체 게시글 수 조회
     long countPosts(@Param("searchKeyword") String searchKeyword, @Param("searchUser") String searchUser);
+  
+    // 게시물 상세 조회
+    Optional<PostDto.PostResponse> selectPostById(Long postId);
+
+    // 조회수 증가
+    void updateViewCount(Long postId);
 
 }

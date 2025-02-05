@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.simpleboard.mapper.PostMapper">
+
     <!-- 전체 게시물 조회 -->
     <select id="selectAllPosts" resultType="com.study.simpleboard.dto.PostDto$ListInfo">
         SELECT
@@ -33,7 +34,29 @@
             <if test="searchUser != null and searchUser != ''">
                 AND user_id = #{searchUser}
             </if>
-
     </select>
+  
+    <!-- 게시물 상세 조회 -->
+    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$PostResponse">
+        SELECT
+            post_id,
+            user_id,
+            post_title,
+            post_content,
+            created_at,
+            updated_at,
+            view_count
+        FROM post
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="updateViewCount" parameterType="long">
+        UPDATE post
+        SET view_count = view_count + 1
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </update>
 
 </mapper>
