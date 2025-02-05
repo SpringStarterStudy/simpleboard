@@ -28,8 +28,6 @@ public class PostService {
             throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
         }
 
-        Post post = Post.fromUpdateRequest(request);
-
         postMapper.updatePostById(postId, Post.fromUpdateRequest(request));
 
     }
