@@ -20,6 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("이메일로 유저를 찾을 수 없습니다 : " + email);
         }
+
+        user.validateEnabled(); // 계정 활성화 여부 검증
         return new CustomUserDetails(user);
     }
 }

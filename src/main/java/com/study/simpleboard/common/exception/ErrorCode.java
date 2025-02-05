@@ -15,6 +15,7 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "새 비밀번호와 확인 비밀번호가 일치하지 않습니다."),
     SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "새 비밀번호가 현재 비밀번호와 동일합니다."),
     DELETE_USER_FAILED(HttpStatus.BAD_REQUEST, "회원 탈퇴에 실패했습니다."),
+    ACCOUNT_DISABLED(HttpStatus.UNAUTHORIZED, "비활성화된 계정입니다."),  // 401
 
     // 서버
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),

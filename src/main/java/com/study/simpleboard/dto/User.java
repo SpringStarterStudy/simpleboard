@@ -1,7 +1,10 @@
 package com.study.simpleboard.dto;
 
 
+import com.study.simpleboard.common.exception.CustomException;
+import com.study.simpleboard.common.exception.ErrorCode;
 import lombok.*;
+import org.springframework.security.authentication.DisabledException;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +35,13 @@ public class User {
                 .updatedAt(LocalDateTime.now())
                 .loginType(LoginType.LOCAL)
                 .build();
+    }
+
+    // 계정 활성화 여부
+    public void validateEnabled() {
+        if (!isEnabled) {
+            throw new CustomException(ErrorCode.ACCOUNT_DISABLED);
+        }
     }
 
 }
