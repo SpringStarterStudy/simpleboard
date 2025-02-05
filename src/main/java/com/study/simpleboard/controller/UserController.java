@@ -1,6 +1,7 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.request.*;
 import com.study.simpleboard.dto.response.UserResponse;
 import com.study.simpleboard.service.UserService;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,7 @@ public class UserController {
 
     // 단일 정보 조회
     @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> findById(@PathVariable Long userId) {
+    public ApiResponse<UserResponse> getUserInfo(@PathVariable Long userId) {
         UserResponse userResponse = userService.findById(userId);
         return ApiResponse.success(userResponse);
     }

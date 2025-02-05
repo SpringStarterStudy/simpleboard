@@ -42,7 +42,8 @@ public class UserService {
 
     // 단일 정보 조회
     public UserResponse findById(Long userId) {
-        User user = findUserById(userId);
+        User user = userMapper.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return UserResponse.from(user);
     }
 
@@ -55,7 +56,7 @@ public class UserService {
         user.setCellPhone(updateUserRequest.getCellPhone());
 
         userMapper.updateUser(user);
-        return UserResponse.from(userMapper.findById(userId));
+        return UserResponse.from(user);
     }
 
     // 비밀번호 수정
@@ -93,11 +94,8 @@ public class UserService {
 
     // 2. 회원정보 조회, 수정, 삭제에서 사용되는 검증
     private User findUserById(Long userId) { // ID로 사용자 조회
-        User user = userMapper.findById(userId);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-        return user;
+        return userMapper.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     // 3. 로그인, 회원탈퇴 시 사용되는 검증

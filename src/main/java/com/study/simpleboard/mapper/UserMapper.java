@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Optional;
+
 @Mapper
 public interface UserMapper { // 기본적인 CRUD 작업
     // 회원 가입
@@ -17,10 +19,10 @@ public interface UserMapper { // 기본적인 CRUD 작업
     boolean existsByEmail(String email);
 
     // 회원 조회 (로그인)
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     // 회원 정보 조회
-    User findById(Long userId);
+    Optional<User> findById(Long userId);
 
     // 회원 정보 수정
     void updateUser(User user);
