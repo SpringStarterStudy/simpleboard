@@ -33,36 +33,39 @@ public class UserController {
         return ApiResponse.success(null); // SecurityConfig에서 처리
     }
 
-    // 단일 정보 조회
-    @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> getUserInfo(@PathVariable Long userId) {
-        UserResponse userResponse = userService.findById(userId);
+    // 사용자 정보 조회
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserResponse userResponse = userService.findById(userDetails.getUserId());
         return ApiResponse.success(userResponse);
     }
 
     // 정보 수정
-    @PatchMapping("/{userId}")
+    @PatchMapping("/me")
     public ApiResponse<UserResponse> updateUser(
-            @PathVariable Long userId, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
-        UserResponse userResponse = userService.updateUser(userId, updateUserRequest);
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        UserResponse userResponse = userService.updateUser(userDetails.getUserId(), updateUserRequest);
         return ApiResponse.success(userResponse);
     }
 
     // 비밀번호 수정
-    @PatchMapping("/{userId}/password")
+    @PatchMapping("/me/password")
     public ApiResponse<Void> updatePassword(
-            @PathVariable Long userId, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
-        userService.updatePassword(userId, updatePasswordRequest);
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        userService.updatePassword(userDetails.getUserId(), updatePasswordRequest);
         return ApiResponse.success(null);
     }
 
     // 회원 탈퇴
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/me")
     public ApiResponse<Void> deleteUser(
-            @PathVariable Long userId, @Valid @RequestBody DeleteUserRequest deleteUserRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody DeleteUserRequest deleteUserRequest,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        userService.deleteUser(userId, deleteUserRequest.getPassword());
-        new SecurityContextLogoutHandler().logout(httpRequest, null, null); // 탈퇴 후 자동 로그아웃 처리
+        userService.deleteUser(userDetails.getUserId(), deleteUserRequest.getPassword());
+        new SecurityContextLogoutHandler().logout(httpRequest, null, null);
         return ApiResponse.success(null);
     }
 

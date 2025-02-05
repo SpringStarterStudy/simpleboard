@@ -11,11 +11,13 @@ import java.util.Collections;
 
 @Getter
 public class CustomUserDetails implements UserDetails {
+    private Long userId;
     private String email;
     private String password;
     private boolean enabled;
 
     public CustomUserDetails(User user) {
+        this.userId = user.getUserId();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.enabled = user.isEnabled();
@@ -50,5 +52,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return this.enabled;
     }
-
 }
