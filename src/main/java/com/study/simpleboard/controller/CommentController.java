@@ -36,7 +36,7 @@ public class CommentController {
 
     @PutMapping("/comments/{commentId}")
     public ApiResponse<Void> updateComment(@PathVariable Long commentId,
-        @RequestBody CommentRequestDTO requestDTO) {
+        @Valid @RequestBody CommentRequestDTO requestDTO) {
         commentService.updateComment(2L, commentId, requestDTO);
         return ApiResponse.success("댓글이 수정되었습니다.");  //TODO response 수정
     }
