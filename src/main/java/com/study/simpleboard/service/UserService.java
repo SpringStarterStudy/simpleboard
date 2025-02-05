@@ -44,13 +44,6 @@ public class UserService {
         return UserResponse.from(user);
     }
 
-    // 로그인
-    public UserResponse login(LoginRequest loginRequest) {
-        User user = findUserByEmail(loginRequest.getEmail());
-        validatePassword(loginRequest.getPassword(), user.getPassword());
-        return UserResponse.from(user);
-    }
-
     // 단일 정보 조회
     public UserResponse findById(Long userId) {
         User user = findUserById(userId);
@@ -102,16 +95,7 @@ public class UserService {
         }
     }
 
-    // 2. 로그인 시 사용되는 검증
-    private User findUserByEmail(String email) { // 이메일로 사용자 조회
-        User user = userMapper.findByEmail(email);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-        return user;
-    }
-
-    // 3. 회원정보 조회, 수정, 삭제에서 사용되는 검증
+    // 2. 회원정보 조회, 수정, 삭제에서 사용되는 검증
     private User findUserById(Long userId) { // ID로 사용자 조회
         User user = userMapper.findById(userId);
         if (user == null) {
@@ -120,7 +104,7 @@ public class UserService {
         return user;
     }
 
-    // 4. 로그인, 회원탈퇴 시 사용되는 검증
+    // 3. 로그인, 회원탈퇴 시 사용되는 검증
     private void validatePassword(String rawPassword, String encodedPassword) {
         // 입력된 비밀번호와 암호화된 비밀번호 비교
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
@@ -128,7 +112,7 @@ public class UserService {
         }
     }
 
-    // 5. 비밀번호 변경 시 사용되는 검증
+    // 4. 비밀번호 변경 시 사용되는 검증
     private void validateCurrentPassword(String currentPassword, String userPassword) {
         // 현재 비밀번호 확인
         if (!passwordEncoder.matches(currentPassword, userPassword)) {
@@ -145,7 +129,7 @@ public class UserService {
         }
     }
 
-    // 6. 회원 정보 수정시 사용되는 검증
+    // 5. 회원 정보 수정시 사용되는 검증
     private void validateDuplicateName(String name, Long userId) {
         // 변경하려는 이름이 이미 사용중인지 확인 (본인의 현재 이름은 중복 체크에서 제외)
         if (userMapper.existsByNameAndNotId(name, userId)) {

@@ -25,13 +25,6 @@ public class UserController {
         return ApiResponse.success(createdUser);
     }
 
-    // 로그인
-    @PostMapping("/login")
-    public ApiResponse<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserResponse userResponse = userService.login(loginRequest);
-        return ApiResponse.success(userResponse);
-    }
-
     // 로그아웃
     @PostMapping("/logout")
     public ApiResponse<Void> logout(HttpServletRequest request) {
