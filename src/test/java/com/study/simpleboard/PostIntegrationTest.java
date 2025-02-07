@@ -3,6 +3,8 @@ package com.study.simpleboard;
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.PostDto;
+import com.study.simpleboard.mapper.PostMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,8 +35,8 @@ public class PostIntegrationTest {
     private WebApplicationContext context;
     private MockMvc mockMvc;
 
-//    @Autowired
-//    private PostRepository postRepository;
+    @Autowired
+    private PostMapper postMapper;
 
     @BeforeEach
     public void init() {
@@ -58,7 +63,12 @@ public class PostIntegrationTest {
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.message").value("게시글이 저장되었습니다."));
 
-        // TODO: 저장된 게시글 조회 후 db에 저장되었는지 검증 필요
+        long postId = 1L;
+        Optional<PostDto.PostResponse> postData = postMapper.selectPostById(postId);
+        assertThat(postData).isPresent();
+        PostDto.PostResponse post = postData.get();
+        assertThat(post.getTitle()).isEqualTo(title);
+        assertThat(post.getContent()).isEqualTo(content);
     }
 
     @Test
@@ -79,7 +89,7 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
-//                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value("제목을 입력해주세요."));
     }
 
@@ -101,7 +111,7 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
-//                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value("제목을 입력해주세요."));
     }
 
@@ -123,7 +133,7 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
-//                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
     }
 
@@ -145,7 +155,7 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
-//                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
     }
 
