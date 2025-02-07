@@ -3,7 +3,6 @@ package com.study.simpleboard;
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.PostCreateReq;
-import com.study.simpleboard.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

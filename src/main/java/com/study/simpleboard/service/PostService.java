@@ -14,13 +14,11 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import com.study.simpleboard.domain.Post;
 import com.study.simpleboard.dto.PostCreateReq;
-import com.study.simpleboard.repository.PostRepository;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostMapper postMapper;
-    private final PostRepository postRepository;
     private static final int PAGE_GROUP_SIZE = 5;
 
     // 전체 게시물 목록 조회
@@ -108,6 +106,6 @@ public class PostService {
     @Transactional
     public void savePost(PostCreateReq postCreateReq) {
         // userId 검증은 나중에 인증 구현 후 추가 예정
-        postRepository.save(Post.from(postCreateReq));
+        postMapper.save(Post.from(postCreateReq));
     }
 }
