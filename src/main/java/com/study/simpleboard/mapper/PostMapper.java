@@ -1,5 +1,6 @@
 package com.study.simpleboard.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import com.study.simpleboard.dto.PostDto;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.Optional;
@@ -24,5 +25,12 @@ public interface PostMapper {
 
     // 조회수 증가
     void updateViewCount(Long postId);
+    
+    // 게시물 존재 여부
+    boolean existsById(Long postId);
+    // 게시물 작성자 확인
+    boolean existsByPostIdAndUserId(Long postId, Long userId);
+    // 게시물 삭제 (soft-delete)
+    void deletePostById(Long postId, Long userId);
 
 }
