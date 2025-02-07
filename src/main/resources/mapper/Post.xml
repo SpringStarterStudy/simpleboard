@@ -84,5 +84,11 @@
         UPDATE post
         SET deleted_at = CURRENT_TIMESTAMP, updated_at = updated_at
     </update>
+    
+    <!--게시물 작성-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into post(user_id, post_title, post_content, created_at, view_count)
+        values(#{post.userId}, #{post.title}, #{post.content}, #{post.createdAt}, #{post.viewCount})
+    </insert>
 
 </mapper>

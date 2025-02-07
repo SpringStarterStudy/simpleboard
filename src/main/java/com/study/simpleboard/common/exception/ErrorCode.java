@@ -1,6 +1,5 @@
 package com.study.simpleboard.common.exception;
 
-import jakarta.validation.ValidationException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

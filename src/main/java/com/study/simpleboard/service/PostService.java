@@ -4,26 +4,20 @@ import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.study.simpleboard.dto.PostDto;
-import com.study.simpleboard.mapper.PostMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import com.study.simpleboard.domain.Post;
+import com.study.simpleboard.dto.PostCreateReq;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
-
     private final PostMapper postMapper;
     private static final int PAGE_GROUP_SIZE = 5;
 
@@ -109,4 +103,9 @@ public class PostService {
         postMapper.deletePostById(postId, userId);
     }
 
+    @Transactional
+    public void savePost(PostCreateReq postCreateReq) {
+        // userId 검증은 나중에 인증 구현 후 추가 예정
+        postMapper.save(Post.from(postCreateReq));
+    }
 }
