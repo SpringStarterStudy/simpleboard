@@ -7,13 +7,93 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.study.simpleboard.dto.PostDto;
+import com.study.simpleboard.mapper.PostMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostMapper postMapper;
+    private static final int PAGE_GROUP_SIZE = 5;
 
+    // 전체 게시물 목록 조회
+    @Transactional(readOnly = true)
+    public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPosts(
+            Pageable pageable, String searchKeyword, String searchUser
+    ) {
+
+        long totalPostCount = postMapper.countPosts(searchKeyword, searchUser);
+
+        if(totalPostCount == 0) {
+            return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+                    .postList(List.of())
+                    .currentPage(pageable.getPageNumber() + 1)
+                    .currentSize(0)
+                    .postPerPage(pageable.getPageSize())
+                    .totalPostsCount(0L)
+                    .totalPages(0)
+                    .pageGroupSize(PAGE_GROUP_SIZE)
+                    .build();
+        }
+
+        int totalPages = (int) ((totalPostCount + pageable.getPageSize() - 1) / pageable.getPageSize());
+        if(pageable.getPageNumber() >= totalPages) {
+            throw new CustomException(ErrorCode.PAGE_NOT_FOUND);
+        }
+
+        int offset = (int) pageable.getOffset();
+        int pageSize = pageable.getPageSize();
+
+        List<PostDto.ListInfo> postList =
+                postMapper.selectAllPosts(offset, pageSize, searchKeyword, searchUser);
+
+        Page<PostDto.ListInfo> postPage = new PageImpl<>(postList, pageable, totalPostCount);
+
+        return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+                .postList(postPage.getContent())
+                .currentPage(postPage.getNumber() + 1)
+                .currentSize(postPage.getNumberOfElements())
+                .postPerPage(postPage.getSize())
+                .totalPostsCount(postPage.getTotalElements())
+                .totalPages(postPage.getTotalPages())
+                .pageGroupSize(PAGE_GROUP_SIZE)
+                .build();
+    }
+    
+    @Transactional(readOnly = true)
+    public PostDto.PostResponse findPostById(Long postId) {
+
+        PostDto.PostResponse post = postMapper.selectPostById(postId).
+                orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        return PostDto.PostResponse.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .viewCount(post.getViewCount())
+                .build();
+    }
+
+    @Async
+    @Transactional
+    public void incrementViewCountAsync(Long postId) {
+        postMapper.updateViewCount(postId);
+    }
+  
     @Transactional
     public void deletePost(Long postId, Long userId) {
         boolean exists = postMapper.existsById(postId);
