@@ -32,9 +32,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll() // 누구나 접근 가능
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")  // 특정 유저와 관리자만 접근 가능
-                        .requestMatchers("/api/posts/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**", "/api/comments/**").permitAll()  // GET 요청은 모두 허용
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
                 .formLogin(login -> login
