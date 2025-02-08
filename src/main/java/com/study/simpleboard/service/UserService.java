@@ -25,6 +25,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder; // 비밀번호 암호화를 위한 인코더
 
     // 회원 가입
+    @Transactional
     public UserResponse signUp(SignUpRequest signUpRequest) {
         // 회원 가입 검증
         validateDuplicateUser(signUpRequest.getName(), signUpRequest.getEmail());
@@ -48,6 +49,7 @@ public class UserService {
     }
 
     // 정보 수정
+    @Transactional
     public UserResponse updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         User user = findUserById(userId);
         validateDuplicateName(updateUserRequest.getName(), userId);
@@ -60,6 +62,7 @@ public class UserService {
     }
 
     // 비밀번호 수정
+    @Transactional
     public void updatePassword(Long userId, UpdatePasswordRequest updatePasswordRequest) {
         User user = findUserById(userId);
 
@@ -71,6 +74,7 @@ public class UserService {
     }
 
     // 회원 탈퇴
+    @Transactional
     public void deleteUser(Long userId, String password) {
         User user = findUserById(userId);
         validatePassword(password, user.getPassword());
