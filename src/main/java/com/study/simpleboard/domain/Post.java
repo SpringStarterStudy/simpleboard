@@ -1,11 +1,8 @@
 package com.study.simpleboard.domain;
 
+import com.study.simpleboard.dto.PostDto;
+import lombok.*;
 import com.study.simpleboard.dto.PostCreateReq;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -35,4 +32,13 @@ public class Post {
                 .viewCount(0L)
                 .build();
     }
+  
+    public static Post fromUpdateRequest(PostDto.UpdateRequest updateRequest) {
+        return Post.builder()
+                .userId(updateRequest.getUserId())
+                .title(updateRequest.getTitle())
+                .content(updateRequest.getContent())
+                .build();
+    }
+  
 }

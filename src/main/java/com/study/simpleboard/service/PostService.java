@@ -18,8 +18,10 @@ import com.study.simpleboard.dto.PostCreateReq;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
     private final PostMapper postMapper;
     private static final int PAGE_GROUP_SIZE = 5;
+
 
     // 전체 게시물 목록 조회
     @Transactional(readOnly = true)
@@ -65,6 +67,12 @@ public class PostService {
                 .build();
     }
     
+    @Transactional
+    public void savePost(PostCreateReq postCreateReq) {
+        // userId 검증은 나중에 인증 구현 후 추가 예정
+        postMapper.save(Post.from(postCreateReq));
+    }
+    
     @Transactional(readOnly = true)
     public PostDto.PostResponse findPostById(Long postId) {
 
@@ -87,6 +95,20 @@ public class PostService {
     public void incrementViewCountAsync(Long postId) {
         postMapper.updateViewCount(postId);
     }
+    
+    @Transactional
+    public void updatePost(Long postId, PostDto.UpdateRequest request) {
+        boolean exists = postMapper.existsById(postId);
+        if(!exists) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+    
+        boolean isAuthor = postMapper.existsByPostIdAndUserId(postId, request.getUserId());
+        if(!isAuthor) {
+            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
+        }
+        postMapper.updatePostById(postId, Post.fromUpdateRequest(request));
+    }
   
     @Transactional
     public void deletePost(Long postId, Long userId) {
@@ -103,9 +125,4 @@ public class PostService {
         postMapper.deletePostById(postId, userId);
     }
 
-    @Transactional
-    public void savePost(PostCreateReq postCreateReq) {
-        // userId 검증은 나중에 인증 구현 후 추가 예정
-        postMapper.save(Post.from(postCreateReq));
-    }
 }

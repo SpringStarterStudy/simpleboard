@@ -36,6 +36,12 @@
             </if>
     </select>
   
+    <!--게시물 작성-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into post(user_id, post_title, post_content, created_at, view_count)
+        values(#{post.userId}, #{post.title}, #{post.content}, #{post.createdAt}, #{post.viewCount})
+    </insert>
+  
     <!-- 게시물 상세 조회 -->
     <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$PostResponse">
         SELECT
@@ -54,11 +60,11 @@
     <!-- 조회수 증가 -->
     <update id="updateViewCount" parameterType="long">
         UPDATE post
-        SET view_count = view_count + 1
+        SET view_count = view_count + 1, updated_at = updated_at
         WHERE post_id = #{postId}
             AND deleted_at IS NULL
     </update>
-  
+
     <!-- 게시물 존재 여부 확인 -->
     <select id="existsById" resultType="boolean">
         SELECT EXISTS(
@@ -66,7 +72,7 @@
             FROM post
             WHERE post_id = #{postId}
                 AND deleted_at IS NULL
-        )
+            )
     </select>
 
     <!-- 게시물을 작성한 사용자가 맞는지 확인 -->
@@ -76,19 +82,22 @@
             FROM post
             WHERE post_id = #{postId}
                 AND user_id = #{userId}
-        )
+            )
     </select>
 
+    <!-- 게시물 수정 -->
+    <update id="updatePostById">
+        UPDATE post
+        SET post_title = #{post.title}, post_content = #{post.content}
+        WHERE post_id = #{postId}
+            AND user_id = #{post.userId}
+    </update>
+  
     <!-- 게시물 삭제(Soft-Delete) -->
     <update id="deletePostById">
         UPDATE post
         SET deleted_at = CURRENT_TIMESTAMP, updated_at = updated_at
+        WHERE post_id = #{postId}
     </update>
-    
-    <!--게시물 작성-->
-    <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        insert into post(user_id, post_title, post_content, created_at, view_count)
-        values(#{post.userId}, #{post.title}, #{post.content}, #{post.createdAt}, #{post.viewCount})
-    </insert>
 
 </mapper>

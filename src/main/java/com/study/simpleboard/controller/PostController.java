@@ -18,7 +18,7 @@ public class PostController {
 
     private final PostService postService;
 
-    // 게시글 목록 전체 보기
+    // 게시물 목록 전체 보기
     @GetMapping("/posts")
     public ApiResponse<PostDto.PostsAndPageResponse<PostDto.ListInfo>> getAllPosts(
             @Valid @ModelAttribute PostDto.SearchRequest searchRequest
@@ -31,6 +31,13 @@ public class PostController {
         return ApiResponse.success("게시물 목록을 성공적으로 조회했습니다.", response);
     }
   
+    // 게시물 작성
+    @PostMapping("/posts")
+    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
+        postService.savePost(postCreateReq);
+        return ApiResponse.success("게시물이 저장되었습니다.");
+    }
+  
     // 게시물 상세 조회
     @GetMapping("/posts/{postId}")
     public ApiResponse<PostDto.PostResponse> getPostById(
@@ -39,6 +46,17 @@ public class PostController {
         postService.incrementViewCountAsync(postId);
 
         return ApiResponse.success("게시물을 성공적으로 조회했습니다.", response);
+    }
+  
+    // 게시물 수정
+    @PutMapping("/posts/{postId}")
+    public ApiResponse<Void> updatePost(
+            @PathVariable @Positive(message = "게시물 요청 형식이 올바르지 않습니다.") Long postId,
+            @Valid @RequestBody PostDto.UpdateRequest request
+    ) {
+        postService.updatePost(postId, request);
+
+        return ApiResponse.success("게시물이 수정되었습니다.");
     }
   
     // 게시물 삭제
@@ -52,10 +70,4 @@ public class PostController {
         return ApiResponse.success("게시물을 성공적으로 삭제했습니다.");
     }
 
-    // 게시물 작성
-    @PostMapping("/posts")
-    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
-        postService.savePost(postCreateReq);
-        return ApiResponse.success("게시글이 저장되었습니다.");
-    }
 }
