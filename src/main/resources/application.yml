@@ -8,6 +8,7 @@ spring:
     password: ${DB_PASSWORD}
 
 mybatis:
+  type-aliases-package: com.study.simpleboard.domain
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true

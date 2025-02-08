@@ -2,6 +2,69 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.study.simpleboard.mapper.PostMapper">
 
+    <!-- 전체 게시물 조회 -->
+    <select id="selectAllPosts" resultType="com.study.simpleboard.dto.PostDto$ListInfo">
+        SELECT
+            post_id AS id,
+            user_id AS userId,
+            post_title AS title,
+            created_at AS createdAt,
+            view_count AS viewCount
+        FROM post
+        WHERE deleted_at IS NULL
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchUser != null and searchUser != ''">
+                AND user_id = #{searchUser}
+            </if>
+        ORDER BY post_id DESC
+        <!-- 페이지네이션 적용 (MySQL 문법) -->
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 전체 게시글 수 조회 -->
+    <select id="countPosts" resultType="long">
+        SELECT count(*)
+        FROM post
+        WHERE deleted_at IS NULL
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND post_content like concat('%', #{searchKeyword}, '%')
+            </if>
+            <if test="searchUser != null and searchUser != ''">
+                AND user_id = #{searchUser}
+            </if>
+    </select>
+  
+    <!--게시물 작성-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into post(user_id, post_title, post_content, created_at, view_count)
+        values(#{post.userId}, #{post.title}, #{post.content}, #{post.createdAt}, #{post.viewCount})
+    </insert>
+  
+    <!-- 게시물 상세 조회 -->
+    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostDto$PostResponse">
+        SELECT
+            post_id,
+            user_id,
+            post_title,
+            post_content,
+            created_at,
+            updated_at,
+            view_count
+        FROM post
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="updateViewCount" parameterType="long">
+        UPDATE post
+        SET view_count = view_count + 1
+        WHERE post_id = #{postId}
+            AND deleted_at IS NULL
+    </update>
+
     <!-- 게시물 존재 여부 확인 -->
     <select id="existsById" resultType="boolean">
         SELECT EXISTS(
@@ -28,6 +91,13 @@
         SET post_title = #{post.title}, post_content = #{post.content}
         WHERE post_id = #{postId}
             AND user_id = #{post.userId}
+    </update>
+  
+    <!-- 게시물 삭제(Soft-Delete) -->
+    <update id="deletePostById">
+        UPDATE post
+        SET deleted_at = CURRENT_TIMESTAMP, updated_at = updated_at
+        WHERE post_id = #{postId}
     </update>
 
 </mapper>

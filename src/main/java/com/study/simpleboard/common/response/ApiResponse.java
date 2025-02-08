@@ -45,7 +45,7 @@ public class ApiResponse<T> {
 
     public static ApiResponse<String> error(ErrorCode errorCode) {
         return new ApiResponse<>(errorCode.getStatus(), errorCode.getCode(),
-                errorCode.getMessage());
+            errorCode.getMessage());
     }
 
     // MethodArgumentNotValidException 발생 시 사용됨
