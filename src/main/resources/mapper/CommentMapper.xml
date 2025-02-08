@@ -14,4 +14,27 @@
     ORDER BY COALESCE(c.parent_comment_id, c.comment_id), c.created_at ASC
   </select>
 
+  <select id="checkUser" resultType="int">
+    SELECT COUNT(*)
+    FROM comment
+    WHERE comment_id = #{commentId}
+      AND user_id = #{userId}
+      AND deleted_at IS NULL
+  </select>
+
+  <select id="checkCommentId" resultType="int">
+    SELECT COUNT(*)
+    FROM comment
+    WHERE comment_id = #{commentId}
+      AND deleted_at IS NULL
+  </select>
+
+  <update id="updateComment">
+    UPDATE comment
+    SET comment_content = #{commentContent},
+        updated_at = NOW()
+    WHERE comment_id = #{commentId}
+      AND deleted_at IS NULL
+  </update>
+
 </mapper>
