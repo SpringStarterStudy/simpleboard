@@ -60,7 +60,7 @@
     <!-- 조회수 증가 -->
     <update id="updateViewCount" parameterType="long">
         UPDATE post
-        SET view_count = view_count + 1
+        SET view_count = view_count + 1, updated_at = updated_at
         WHERE post_id = #{postId}
             AND deleted_at IS NULL
     </update>

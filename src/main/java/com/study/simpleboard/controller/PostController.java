@@ -18,7 +18,7 @@ public class PostController {
 
     private final PostService postService;
 
-    // 게시글 목록 전체 보기
+    // 게시물 목록 전체 보기
     @GetMapping("/posts")
     public ApiResponse<PostDto.PostsAndPageResponse<PostDto.ListInfo>> getAllPosts(
             @Valid @ModelAttribute PostDto.SearchRequest searchRequest
@@ -35,7 +35,7 @@ public class PostController {
     @PostMapping("/posts")
     public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
         postService.savePost(postCreateReq);
-        return ApiResponse.success("게시글이 저장되었습니다.");
+        return ApiResponse.success("게시물이 저장되었습니다.");
     }
   
     // 게시물 상세 조회
@@ -56,7 +56,7 @@ public class PostController {
     ) {
         postService.updatePost(postId, request);
 
-        return ApiResponse.success("게시글이 수정되었습니다.");
+        return ApiResponse.success("게시물이 수정되었습니다.");
     }
   
     // 게시물 삭제

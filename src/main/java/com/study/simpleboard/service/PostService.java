@@ -121,6 +121,8 @@ public class PostService {
         if(!isAuthor) {
             throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
         }
+
+        postMapper.deletePostById(postId, userId);
     }
 
 }
