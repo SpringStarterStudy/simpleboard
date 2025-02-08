@@ -16,7 +16,7 @@ public class UpdatePasswordRequest {
     private String currentPassword;
 
     @NotNull(message = "새 비밀번호는 필수 입력값입니다.")
-    @Size(min = 10, message = "비밀번호는 10자 이상이어야 합니다.")
+    @Size(min = 10, max = 72, message = "비밀번호는 10자 이상이어야 합니다.")
     @Pattern.List({
             @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = "비밀번호는 특수문자를 포함해야 합니다."),
             @Pattern(regexp = ".*[A-Z].*", message = "비밀번호는 대문자를 포함해야 됩니다."),
