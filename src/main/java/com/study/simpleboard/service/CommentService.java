@@ -20,6 +20,10 @@ public class CommentService {
     @Transactional
     public void createComment(Long postId, Long userId, CommentRequestDTO requestDTO) {
         //TODO postId 유효성 검사
+        if (requestDTO.getParentId() != null && commentMapper.checkCommentId(requestDTO.getParentId()) == 0) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
         commentMapper.insertComment(new CommentCreateDTO(userId, postId,
             requestDTO.getCommentContent()));
 
