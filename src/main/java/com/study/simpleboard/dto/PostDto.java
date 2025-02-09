@@ -1,5 +1,6 @@
 package com.study.simpleboard.dto;
 
+import lombok.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +50,19 @@ public class PostDto {
         public Pageable toPageable() {
             return PageRequest.of(page - 1, size);
         }
+    }
+  
+    // 게시물 상세 정보
+    @Getter
+    @Builder
+    public static class PostResponse {
+        private Long id;
+        private Long userId;
+        private String title;
+        private String content;
+        private String createdAt;
+        private String updatedAt;
+        private Long viewCount;
     }
 
 }

@@ -2,25 +2,23 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
-import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.study.simpleboard.dto.PostDto;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+import com.study.simpleboard.domain.Post;
+import com.study.simpleboard.dto.PostCreateReq;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PostService {
-
     private final PostMapper postMapper;
-
     private static final int PAGE_GROUP_SIZE = 5;
 
     // 전체 게시물 목록 조회
@@ -66,5 +64,48 @@ public class PostService {
                 .pageGroupSize(PAGE_GROUP_SIZE)
                 .build();
     }
+    
+    @Transactional(readOnly = true)
+    public PostDto.PostResponse findPostById(Long postId) {
 
+        PostDto.PostResponse post = postMapper.selectPostById(postId).
+                orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        return PostDto.PostResponse.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .viewCount(post.getViewCount())
+                .build();
+    }
+
+    @Async
+    @Transactional
+    public void incrementViewCountAsync(Long postId) {
+        postMapper.updateViewCount(postId);
+    }
+  
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        boolean exists = postMapper.existsById(postId);
+        if(!exists) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
+        boolean isAuthor = postMapper.existsByPostIdAndUserId(postId, userId);
+        if(!isAuthor) {
+            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
+        }
+
+        postMapper.deletePostById(postId, userId);
+    }
+
+    @Transactional
+    public void savePost(PostCreateReq postCreateReq) {
+        // userId 검증은 나중에 인증 구현 후 추가 예정
+        postMapper.save(Post.from(postCreateReq));
+    }
 }

@@ -1,6 +1,5 @@
 package com.study.simpleboard.common.exception;
 
-import jakarta.validation.ValidationException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -16,9 +15,14 @@ public enum ErrorCode {
 
     // 게시물
     PAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "P_001", "해당 페이지는 존재하지 않습니다."),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P_002", "해당되는 id의 게시물을 찾을 수 없습니다."),
+    NO_POST_AUTHORITY(HttpStatus.FORBIDDEN, "P_003", "해당 게시물의 작성자가 아닙니다."),
 
     // ValidationException
-    VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "V_001", "잘못된 입력 형식입니다.");
+    VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "V_001", "잘못된 입력 형식입니다."),
+
+    // 좋아요/싫어요
+    INVALID_REACTION(HttpStatus.BAD_REQUEST, "R_001", "잘못된 좋아요/싫어요 반응 요청입니다.");
 
     private final HttpStatus status;
     private final String code;
