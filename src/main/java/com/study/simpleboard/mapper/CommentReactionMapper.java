@@ -11,6 +11,9 @@ import java.util.List;
 @Mapper
 public interface CommentReactionMapper {
 
+    // 댓글 확인 (boolean)
+    boolean existsByCommentId(Long commentId);
+
     // 새 반응 삽입
     void insertCommentReaction(CommentReactionRequestDTO commentReactionrequestDTO);
 

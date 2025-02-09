@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentReactionRequestDTO {
     private Long userId;
+    @NotNull
     private Long targetId;
+    @NotNull
     private ReactionType reactionType;
 }
