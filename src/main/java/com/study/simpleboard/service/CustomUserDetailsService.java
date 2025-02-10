@@ -16,12 +16,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userMapper.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("이메일로 유저를 찾을 수 없습니다 : " + email);
-        }
-
-        user.validateEnabled(); // 계정 활성화 여부 검증
-        return new CustomUserDetails(user);
+        return userMapper.findByEmail(email)
+                .map(user -> {
+                    user.validateEnabled(); // 계정 활성화 여부 검증
+                    return new CustomUserDetails(user);
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("이메일로 유저를 찾을 수 없습니다 : " + email));
     }
 }

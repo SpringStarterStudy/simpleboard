@@ -2,16 +2,24 @@ package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.*;
 import com.study.simpleboard.dto.response.UserResponse;
+import com.study.simpleboard.service.KakaoUserService;
 import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 
 @RestController
@@ -19,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final KakaoUserService kakaoUserService;
 
     // 회원 가입
     @PostMapping("/signup")
@@ -69,4 +78,10 @@ public class UserController {
         return ApiResponse.success(null);
     }
 
+    // 카카오 로그인
+    @GetMapping("/login/kakao")
+    public ApiResponse<UserResponse> kakaoLogin(@RequestParam String code) {
+        UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
+        return ApiResponse.success(userResponse);
+    }
 }

@@ -37,11 +37,22 @@ public class User {
                 .build();
     }
 
+    // 카카오 유저 생성을 위한 정적 팩토리 메서드
+    public static User createKakaoUser(KakaoUser kakaoUser) {
+        return User.builder()
+                .email(kakaoUser.getKakaoAccount().getEmail())
+                .name(kakaoUser.getKakaoAccount().getProfile().getNickname())
+                .isEnabled(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .loginType(LoginType.KAKAO)
+                .build();
+    }
+
     // 계정 활성화 여부
     public void validateEnabled() {
         if (!isEnabled) {
             throw new CustomException(ErrorCode.ACCOUNT_DISABLED);
         }
     }
-
 }

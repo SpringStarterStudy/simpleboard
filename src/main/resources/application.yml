@@ -6,9 +6,15 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
   mybatis:
     mapper-locations: classpath:mapper/**/*.xml
     configuration:
       map-underscore-to-camel-case: true
       default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler # ENUM 타입 사용
+
+kakao:
+  client:
+    id: f9ef490a135bed0007a7a5a2fcfbafef
+    secret: wkzm4tL4N0obq0VnTPaqJH7oEJuXMjJ4
+  redirect:
+    uri: http://localhost:8080/api/users/login/kakao

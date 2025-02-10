@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.simpleboard.mapper.UserSocialMapper">
+
+    <insert id="insertUserSocial" parameterType="UserSocial" useGeneratedKeys="true" keyProperty="userSocialId">
+        INSERT INTO user_social (
+            user_id,
+            provider,
+            provider_id,
+            access_token,
+            refresh_token,
+            token_expiry_date
+        ) VALUES (
+            #{userId},
+            #{provider},
+            #{providerId},
+            #{accessToken},
+            #{refreshToken},
+            #{tokenExpiryDate}
+        )
+    </insert>
+
+    <select id="findByProviderAndProviderId" resultType="UserSocial">
+        SELECT *
+        FROM user_social
+        WHERE provider = #{provider}
+        AND provider_id = #{providerId}
+    </select>
+
+    <update id="updateToken" parameterType="UserSocial">
+        UPDATE user_social
+        SET
+        access_token = #{accessToken},
+        refresh_token = #{refreshToken},
+        token_expiry_date = #{tokenExpiryDate}
+        WHERE user_social_id = #{userSocialId}
+    </update>
+</mapper>
