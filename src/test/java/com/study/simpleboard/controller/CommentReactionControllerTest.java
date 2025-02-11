@@ -81,7 +81,7 @@ class CommentReactionControllerTest {
     }
 
     private CommentReactionRequestDTO getRequest(Long userId, ReactionType reactionType) {
-        return new CommentReactionRequestDTO(userId, COMMENT_ID, reactionType);
+        return new CommentReactionRequestDTO(userId, reactionType);
     }
 
     private ResultActions performPostRequest(Long commentId, CommentReactionRequestDTO mockRequest) throws Exception {
