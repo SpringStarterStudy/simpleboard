@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,5 +51,5 @@ public class GlobalExceptionHandler {
         String field = fullPath.substring(fullPath.lastIndexOf(".") + 1); // 필드명만 추출
         return field + ": " + violation.getMessage();
     }
-  
 }
+
