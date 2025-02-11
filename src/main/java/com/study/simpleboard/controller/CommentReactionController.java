@@ -4,6 +4,7 @@ import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.service.CommentReactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class CommentReactionController {
     @PostMapping("comments/{commentId}/reaction")
     public ApiResponse<Void> handleReaction(
             @PathVariable Long commentId,
-            @RequestBody CommentReactionRequestDTO inputReactionRequestDTO) {
+            @Valid @RequestBody CommentReactionRequestDTO inputReactionRequestDTO) {
         commentReactionService.updateCommentReaction(
                 inputReactionRequestDTO.getUserId(),
                 commentId,

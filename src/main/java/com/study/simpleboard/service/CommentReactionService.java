@@ -1,8 +1,11 @@
 package com.study.simpleboard.service;
 
+import com.study.simpleboard.common.exception.CustomException;
+import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CommentReactionRequestDTO;
 import com.study.simpleboard.dto.CommentReactionResponseDTO;
+import com.study.simpleboard.mapper.CommentMapper;
 import com.study.simpleboard.mapper.CommentReactionMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +19,11 @@ import java.util.Map;
 public class CommentReactionService {
 
     private final CommentReactionMapper commentReactionMapper;
+    private final CommentMapper commentMapper;
 
-    public CommentReactionService(CommentReactionMapper commentReactionMapper) {
+    public CommentReactionService(CommentReactionMapper commentReactionMapper, CommentMapper commentMapper) {
         this.commentReactionMapper = commentReactionMapper;
+        this.commentMapper = commentMapper;
     }
 
     // 특정 유저가 특정 댓글에 반응을 하였는지 여부
@@ -41,7 +46,15 @@ public class CommentReactionService {
     // 유저 반응 업데이트
     @Transactional
     public void updateCommentReaction(Long userId, Long commentId, CommentReactionRequestDTO inputReactionRequestDTO) {
-        // TODO 댓글이 현재 유효한지 검증
+        // 댓글이 현재 유효한지 검증
+        if (!commentMapper.existsByCommentId(commentId)) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);  // C_001: 존재하지 않는 댓글
+        }
+
+        if (inputReactionRequestDTO == null || inputReactionRequestDTO.getReactionType() == null) {
+            throw new CustomException(ErrorCode.INVALID_REACTION);
+        }
+
         // 반응 타입까지 포함하여 조회
         CommentReactionResponseDTO existingReaction = commentReactionMapper.findByUserIdCommentIdAndReactionType(
                 userId,
@@ -67,12 +80,10 @@ public class CommentReactionService {
 
 
     private void insertCommentReaction(Long userId, Long commentId, CommentReactionRequestDTO inputReactionDTO) {
-        // 새 반응 추가 시 항상 활성화 상태로 설정
-        CommentReactionRequestDTO newReaction = new CommentReactionRequestDTO(
+        commentReactionMapper.insertCommentReaction(
                 userId,
                 commentId,
                 inputReactionDTO.getReactionType()
         );
-        commentReactionMapper.insertCommentReaction(newReaction);
     }
 }

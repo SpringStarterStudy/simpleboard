@@ -12,7 +12,7 @@ import java.util.List;
 public interface CommentReactionMapper {
 
     // 새 반응 삽입
-    void insertCommentReaction(CommentReactionRequestDTO commentReactionrequestDTO);
+    void insertCommentReaction(@Param("userId") Long userId, @Param("commentId") Long commentId, @Param("reactionType") ReactionType reactionType);
 
     // 활성화 상태만 업데이트
     void updateReactionStatus(@Param("reactionId") Long reactionId, @Param("isActive") boolean isActive);

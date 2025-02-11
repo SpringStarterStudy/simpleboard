@@ -11,7 +11,7 @@
         is_active
         ) VALUES (
         #{userId},
-        #{targetId},
+        #{commentId},
         'COMMENT',
         #{reactionType},
         true
