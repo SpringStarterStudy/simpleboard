@@ -22,3 +22,6 @@ DROP FOREIGN KEY FK_user_TO_reaction_1,
 ADD CONSTRAINT FK_user_TO_reaction_cascade
 FOREIGN KEY (user_id) REFERENCES user(user_id)
 ON DELETE CASCADE;
+
+-- user_social 테이블에서 access_token 컬럼 제거
+ALTER TABLE user_social DROP COLUMN access_token;

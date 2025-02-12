@@ -124,7 +124,12 @@ public class KakaoUserService {
         if (userSocial.isPresent()) {
             User user = userMapper.findById(userSocial.get().getUserId())
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-            updateKakaoToken(userSocial.get(), kakaoToken);
+
+            // 리프레시 토큰이 변경된 경우에만 업데이트
+            if (!userSocial.get().getRefreshToken().equals(kakaoToken.getRefreshToken())) {
+                updateKakaoToken(userSocial.get(), kakaoToken);
+            }
+
             return user;
         }
 
@@ -145,7 +150,7 @@ public class KakaoUserService {
 
     @Transactional
     private void updateKakaoToken(UserSocial userSocial, KakaoToken kakaoToken) {
-        userSocial.updateToken(kakaoToken);
+        userSocial.updateToken(kakaoToken); // 리프레시 토큰 업데이트
         userSocialMapper.updateToken(userSocial);
     }
 

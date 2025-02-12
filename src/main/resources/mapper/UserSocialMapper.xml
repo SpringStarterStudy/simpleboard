@@ -8,14 +8,12 @@
             user_id,
             provider,
             provider_id,
-            access_token,
             refresh_token,
             token_expiry_date
         ) VALUES (
             #{userId},
             #{provider},
             #{providerId},
-            #{accessToken},
             #{refreshToken},
             #{tokenExpiryDate}
         )
@@ -31,7 +29,6 @@
     <update id="updateToken" parameterType="UserSocial">
         UPDATE user_social
         SET
-        access_token = #{accessToken},
         refresh_token = #{refreshToken},
         token_expiry_date = #{tokenExpiryDate}
         WHERE user_social_id = #{userSocialId}

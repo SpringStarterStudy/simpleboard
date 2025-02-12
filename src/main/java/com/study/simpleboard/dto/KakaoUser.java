@@ -3,6 +3,7 @@ package com.study.simpleboard.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// 카카오에 등록되어 있는 계정 정보
 @Getter
 @NoArgsConstructor
 public class KakaoUser {
