@@ -11,11 +11,11 @@
             and target_type = #{targetType}
     </sql>
 
-    <select id="findAllReactions" resultType="Reaction">
+    <select id="findAllReactions" resultType="com.study.simpleboard.domain.Reaction">
         <include refid="baseSelectQuery" />
     </select>
 
-    <select id="findReaction" resultType="Reaction">
+    <select id="findReaction" resultType="com.study.simpleboard.domain.Reaction">
         <include refid="baseSelectQuery" />
             and reaction_type = #{reactionType}
     </select>
