@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +19,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.util.Collections;
 
 
@@ -28,6 +31,12 @@ import java.util.Collections;
 public class UserController {
     private final UserService userService;
     private final KakaoUserService kakaoUserService;
+
+    @Value("${kakao.client.id}")
+    private String clientId;
+
+    @Value("${kakao.client.redirect-uri}")
+    private String redirectUri;
 
     // 회원 가입
     @PostMapping("/signup")
@@ -83,5 +92,18 @@ public class UserController {
     public ApiResponse<UserResponse> kakaoLogin(@RequestParam String code) {
         UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
         return ApiResponse.success(userResponse);
+    }
+
+    // 카카오 인증 코드 요청 페이지
+    @GetMapping("/oauth/kakao")
+    public void redirectToKakaoAuthorization(HttpServletResponse response) throws IOException {
+        String kakaoAuthorizationUrl = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
+                .queryParam("client_id", clientId)
+                .queryParam("redirect_uri", redirectUri)
+                .queryParam("response_type", "code")
+                .queryParam("scope", "profile_nickname,account_email") // 필요한 권한 설정
+                .build().toUriString();
+
+        response.sendRedirect(kakaoAuthorizationUrl);
     }
 }
