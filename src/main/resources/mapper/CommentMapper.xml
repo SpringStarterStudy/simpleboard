@@ -7,6 +7,14 @@
     VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt})
   </insert>
 
+  <select id="existsByCommentId" resultType="boolean">
+    SELECT EXISTS (
+    SELECT 1 FROM comment
+    WHERE comment_id = #{commentId}
+    AND deleted_at IS NULL
+    )
+  </select>
+
   <select id="selectCommentList" resultType="com.study.simpleboard.dto.CommentResponseDTO" parameterType="long">
     SELECT c.comment_id, c.user_id, c.post_id, c.parent_comment_id, c.comment_content, c.created_at
     FROM comment c
@@ -36,6 +44,14 @@
   <update id="deleteComment">
     UPDATE comment
     SET deleted_at = NOW()
+    WHERE comment_id = #{commentId}
+      AND deleted_at IS NULL
+  </update>
+
+  <update id="updateComment">
+    UPDATE comment
+    SET comment_content = #{commentContent},
+        updated_at = NOW()
     WHERE comment_id = #{commentId}
       AND deleted_at IS NULL
   </update>
