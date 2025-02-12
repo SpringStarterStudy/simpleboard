@@ -107,7 +107,8 @@ public class KakaoUserService {
         return response.getBody();
     }
 
-    // 회원 찾기/생성 메서드
+    // 메서드
+    // 회원 찾기/생성
     private User findOrCreateKakaoUser(KakaoToken kakaoToken, KakaoUser kakaoUser, String providerId) {
         Optional<UserSocial> userSocial = userSocialMapper.findByProviderAndProviderId(String.valueOf(SocialType.KAKAO), providerId);
 
@@ -123,7 +124,7 @@ public class KakaoUserService {
         return newUser;
     }
 
-    // 인증 처리 메서드
+    // 인증 처리
     private void authenticateUser(User user) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 new CustomUserDetails(user),
