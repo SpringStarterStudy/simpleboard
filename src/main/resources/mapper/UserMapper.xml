@@ -34,10 +34,10 @@
     </select>
 
     <select id="existsByEmail" parameterType="string" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1
-            FROM user
-            WHERE email = #{email}
+        SELECT EXISTS (SELECT 1
+                       FROM user
+                       WHERE email = #{email}
+        )
     </select>
 
     <select id="findByEmail" parameterType="string" resultType="com.study.simpleboard.dto.User">
