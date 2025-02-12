@@ -50,28 +50,11 @@ public class KakaoUserService {
         String providerId = String.valueOf(kakaoUser.getId());
 
         // 카카오 ID로 가입된 기존 회원인지 확인
-        Optional<UserSocial> userSocial = userSocialMapper.findByProviderAndProviderId(String.valueOf(SocialType.KAKAO), providerId);
-
-        User user;
-        if (userSocial.isPresent()) {
-            // 기존 회원이면 토큰 업데이트
-            user = userMapper.findById(userSocial.get().getUserId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-            updateKakaoToken(userSocial.get(), kakaoToken);
-        } else {
-            // 신규 회원이면 회원가입 처리
-            user = createKakaoUser(kakaoUser);
-            createUserSocial(user.getUserId(), providerId, kakaoToken);
-        }
+        // 회원 찾기 또는 생성
+        User user = findOrCreateKakaoUser(kakaoToken, kakaoUser, providerId);
 
         // 인증 처리
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                new CustomUserDetails(user),  // 실제 User 엔티티 사용
-                null,
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        authenticateUser(user);
 
         return UserResponse.from(user);
     }
@@ -122,6 +105,32 @@ public class KakaoUserService {
         );
 
         return response.getBody();
+    }
+
+    // 회원 찾기/생성 메서드
+    private User findOrCreateKakaoUser(KakaoToken kakaoToken, KakaoUser kakaoUser, String providerId) {
+        Optional<UserSocial> userSocial = userSocialMapper.findByProviderAndProviderId(String.valueOf(SocialType.KAKAO), providerId);
+
+        if (userSocial.isPresent()) {
+            User user = userMapper.findById(userSocial.get().getUserId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            updateKakaoToken(userSocial.get(), kakaoToken);
+            return user;
+        }
+
+        User newUser = createKakaoUser(kakaoUser);
+        createUserSocial(newUser.getUserId(), providerId, kakaoToken);
+        return newUser;
+    }
+
+    // 인증 처리 메서드
+    private void authenticateUser(User user) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                new CustomUserDetails(user),
+                null,
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Transactional
