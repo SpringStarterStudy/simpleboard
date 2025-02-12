@@ -43,7 +43,7 @@ public class UserService {
     }
 
     // 단일 정보 조회
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and (authentication.principal.id == #userId or hasRole('ADMIN'))")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and (authentication.principal.userId == #userId or hasRole('ADMIN'))")
     public UserResponse findById(Long userId) {
         User user = userMapper.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -52,7 +52,7 @@ public class UserService {
 
     // 정보 수정
     @Transactional
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.id == #userId")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.userId == #userId")
     public UserResponse updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         User user = findUserById(userId);
         validateDuplicateName(updateUserRequest.getName(), userId);
@@ -66,7 +66,7 @@ public class UserService {
 
     // 비밀번호 수정
     @Transactional
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.id == #userId")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.userId == #userId")
     public void updatePassword(Long userId, UpdatePasswordRequest updatePasswordRequest) {
         User user = findUserById(userId);
 
@@ -79,7 +79,7 @@ public class UserService {
 
     // 회원 탈퇴
     @Transactional
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.id == #userId")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and authentication.principal.userId == #userId")
     public void deleteUser(Long userId, String password) {
         User user = findUserById(userId);
         validatePassword(password, user.getPassword());
