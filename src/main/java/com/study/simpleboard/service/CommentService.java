@@ -6,6 +6,7 @@ import com.study.simpleboard.dto.CommentCreateDTO;
 import com.study.simpleboard.dto.request.CommentRequestDTO;
 import com.study.simpleboard.dto.response.CommentResponseDTO;
 import com.study.simpleboard.mapper.CommentMapper;
+import com.study.simpleboard.mapper.PostMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final PostMapper postMapper;
 
     @Transactional
     public void createComment(Long postId, Long userId, CommentRequestDTO requestDTO) {
-        //TODO postId 유효성 검사
+
+        if (!postMapper.existsById(postId)) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
         commentMapper.insertComment(new CommentCreateDTO(userId, postId,
             requestDTO.getCommentContent()));
 
     }
 
     public List<CommentResponseDTO> getCommentList(Long postId) {
-        //TODO postId 유효성 검사
+
+        if (!postMapper.existsById(postId)) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
         return commentMapper.selectCommentList(postId);
     }
 
