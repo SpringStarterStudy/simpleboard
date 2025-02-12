@@ -25,6 +25,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class KakaoUserService {
+    public static final String TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token";
+    public static final String USER_INFO_REQUEST_URL = "https://kapi.kakao.com/v2/user/me";
+    public static final String GRANT_TYPE_PARAM = "grant_type";
+    public static final String GRANT_TYPE_VALUE = "authorization_code";
+    public static final String CLIENT_ID_PARAM = "client_id";
+    public static final String CLIENT_SECRET_PARAM = "client_secret";
+    public static final String REDIRECT_URI_PARAM = "redirect_uri";
+    public static final String CODE_PARAM = "code";
+
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserSocialMapper userSocialMapper;
@@ -61,17 +70,17 @@ public class KakaoUserService {
 
     // 카카오 액세스 토큰 요청
     private KakaoToken getKakaoToken(String code) {
-        String reqURL = "https://kauth.kakao.com/oauth/token";
+        String reqURL = TOKEN_REQUEST_URL;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("redirect_uri", redirectUri);
-        params.add("code", code);
+        params.add(GRANT_TYPE_PARAM, GRANT_TYPE_VALUE);
+        params.add(CLIENT_ID_PARAM, clientId);
+        params.add(CLIENT_SECRET_PARAM, clientSecret);
+        params.add(REDIRECT_URI_PARAM, redirectUri);
+        params.add(CODE_PARAM, code);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
@@ -88,7 +97,7 @@ public class KakaoUserService {
 
     // 카카오 사용자 정보 요청
     private KakaoUser getKakaoUser(String accessToken) {
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
+        String reqURL = USER_INFO_REQUEST_URL;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
