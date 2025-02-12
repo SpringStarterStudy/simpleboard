@@ -15,7 +15,7 @@ mybatis:
 
 kakao:
   client:
-    id: f9ef490a135bed0007a7a5a2fcfbafef
-    secret: wkzm4tL4N0obq0VnTPaqJH7oEJuXMjJ4
+    id: ${KAKAO_CLIENT_ID}
+    secret: ${KAKAO_CLIENT_SECRET}
   redirect:
-    uri: http://localhost:8080/api/users/login/kakao
+    uri: ${KAKAO_REDIRECT_URI}
