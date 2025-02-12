@@ -22,20 +22,31 @@
     ORDER BY COALESCE(c.parent_comment_id, c.comment_id), c.created_at ASC
   </select>
 
-  <select id="checkUser" resultType="int">
-    SELECT COUNT(*)
-    FROM comment
-    WHERE comment_id = #{commentId}
-      AND user_id = #{userId}
-      AND deleted_at IS NULL
+  <select id="checkUser" resultType="boolean">
+    SELECT EXISTS (
+      SELECT 1
+      FROM comment
+      WHERE comment_id = #{commentId}
+        AND user_id = #{userId}
+        AND deleted_at IS NULL
+    )
   </select>
 
-  <select id="checkCommentId" resultType="int">
-    SELECT COUNT(*)
-    FROM comment
+  <select id="checkCommentId" resultType="boolean">
+    SELECT EXISTS (
+      SELECT 1
+      FROM comment
+      WHERE comment_id = #{commentId}
+        AND deleted_at IS NULL
+    )
+  </select>
+
+  <update id="deleteComment">
+    UPDATE comment
+    SET deleted_at = NOW()
     WHERE comment_id = #{commentId}
       AND deleted_at IS NULL
-  </select>
+  </update>
 
   <update id="updateComment">
     UPDATE comment

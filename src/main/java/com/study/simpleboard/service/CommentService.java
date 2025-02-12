@@ -31,6 +31,19 @@ public class CommentService {
     }
 
     @Transactional
+    public void deleteComment(Long userId, Long commentId) {
+        if(!commentMapper.checkCommentId(commentId)) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
+        if(!commentMapper.checkUser(userId, commentId)) {
+            throw new CustomException(ErrorCode.NO_COMMENT_AUTHORITY);
+        }
+
+        commentMapper.deleteComment(commentId);
+    }
+
+    @Transactional
     public void updateComment(Long userId, Long commentId, CommentRequestDTO requestDTO) {
 
         if(commentMapper.checkCommentId(commentId) == 0) {
@@ -43,4 +56,5 @@ public class CommentService {
 
         commentMapper.updateComment(commentId, requestDTO.getCommentContent());
     }
+
 }

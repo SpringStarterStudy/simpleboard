@@ -7,6 +7,7 @@ import com.study.simpleboard.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,11 +35,18 @@ public class CommentController {
         return ApiResponse.success("댓글이 조회되었습니다.", commentService.getCommentList(postId));
     }
 
+    @DeleteMapping("/comments/{commentId}")
+    public ApiResponse<Void> deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(1L, commentId);
+        return ApiResponse.success("댓글이 삭제되었습니다.");
+    }
+
     @PutMapping("/comments/{commentId}")
     public ApiResponse<Void> updateComment(@PathVariable Long commentId,
         @Valid @RequestBody CommentRequestDTO requestDTO) {
         commentService.updateComment(2L, commentId, requestDTO);
         return ApiResponse.success("댓글이 수정되었습니다.");  //TODO response 수정
     }
+
 
 }
