@@ -1,8 +1,8 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
-import com.study.simpleboard.dto.CommentRequestDTO;
-import com.study.simpleboard.dto.CommentResponseDTO;
+import com.study.simpleboard.dto.request.CommentRequestDTO;
+import com.study.simpleboard.dto.response.CommentResponseDTO;
 import com.study.simpleboard.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.List;
