@@ -26,11 +26,11 @@
         )
     </insert>
 
-    <select id="existsByName" parameterType="string" resultType="booelan">
-        SELECT EXISTS (
-            SELECT 1
-            FROM user
-            WHERE name = #{name}
+    <select id="existsByName" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1
+                       FROM user
+                       WHERE name = #{name}
+        )
     </select>
 
     <select id="existsByEmail" parameterType="string" resultType="boolean">
