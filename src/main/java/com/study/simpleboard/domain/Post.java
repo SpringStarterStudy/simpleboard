@@ -1,12 +1,15 @@
 package com.study.simpleboard.domain;
 
-import com.study.simpleboard.dto.PostDto;
-import lombok.*;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostRequestDTO;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@RequiredArgsConstructor
 public class Post {
     private final Long id;
     private final Long userId;
@@ -17,28 +20,12 @@ public class Post {
     private final LocalDateTime deletedAt;
     private final Long viewCount;
 
-    @Builder
-    public Post(Long userId, String title, String content, LocalDateTime createdAt,
-                LocalDateTime updatedAt, LocalDateTime deletedAt, Long viewCount) {
-        this(null, userId, title, content, createdAt, updatedAt, deletedAt, viewCount);
+    public static Post from(PostRequestDTO.CreateAndUpdate createAndUpdate, Long userId) {
+        return Post.builder()
+                .userId(userId)
+                .title(createAndUpdate.getTitle())
+                .content(createAndUpdate.getContent())
+                .build();
     }
 
-    public static Post from(PostCreateReq postCreateReq) {
-        return Post.builder()
-                .userId(postCreateReq.getUserId())
-                .title(postCreateReq.getTitle())
-                .content(postCreateReq.getContent())
-                .createdAt(LocalDateTime.now())
-                .viewCount(0L)
-                .build();
-    }
-  
-    public static Post fromUpdateRequest(PostDto.UpdateRequest updateRequest) {
-        return Post.builder()
-                .userId(updateRequest.getUserId())
-                .title(updateRequest.getTitle())
-                .content(updateRequest.getContent())
-                .build();
-    }
-  
 }
