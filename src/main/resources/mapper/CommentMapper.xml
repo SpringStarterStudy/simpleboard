@@ -7,6 +7,11 @@
     VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt})
   </insert>
 
+  <insert id="insertReply" parameterType="com.study.simpleboard.dto.ReplyCreateDTO">
+    INSERT INTO comment ( user_id, post_id, comment_content, created_at, parent_comment_id )
+    VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt}, #{parentId})
+  </insert>
+
   <select id="existsByCommentId" resultType="boolean">
     SELECT EXISTS (
     SELECT 1 FROM comment

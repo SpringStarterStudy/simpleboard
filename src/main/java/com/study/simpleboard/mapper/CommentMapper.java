@@ -3,6 +3,8 @@ package com.study.simpleboard.mapper;
 import com.study.simpleboard.dto.CommentCreateDTO;
 import com.study.simpleboard.dto.CommentResponseDTO;
 import java.util.List;
+
+import com.study.simpleboard.dto.ReplyCreateDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -11,6 +13,8 @@ public interface CommentMapper {
     boolean existsByCommentId(Long commentId);
 
     void insertComment(CommentCreateDTO createDTO);
+
+    void insertReply(ReplyCreateDTO replyDTO);
 
     List<CommentResponseDTO> selectCommentList(Long postId);
 

@@ -5,6 +5,7 @@ import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.CommentCreateDTO;
 import com.study.simpleboard.dto.CommentRequestDTO;
 import com.study.simpleboard.dto.CommentResponseDTO;
+import com.study.simpleboard.dto.ReplyCreateDTO;
 import com.study.simpleboard.mapper.CommentMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,14 @@ public class CommentService {
         //TODO postId 유효성 검사
         commentMapper.insertComment(new CommentCreateDTO(userId, postId,
             requestDTO.getCommentContent()));
+
+    }
+
+    @Transactional
+    public void createReply(Long postId, Long userId, CommentRequestDTO requestDTO, Long parentId) {
+        //TODO postId 유효성 검사
+        commentMapper.insertReply(new ReplyCreateDTO(userId, postId,
+                requestDTO.getCommentContent(), parentId));
 
     }
 

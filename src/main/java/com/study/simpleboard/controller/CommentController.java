@@ -3,10 +3,12 @@ package com.study.simpleboard.controller;
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CommentRequestDTO;
 import com.study.simpleboard.dto.CommentResponseDTO;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +30,15 @@ public class CommentController {
         @Valid @RequestBody CommentRequestDTO requestDTO) { //TODO 인증객체에서 user 받기
         commentService.createComment(postId, 1L, requestDTO);
         return ApiResponse.success("댓글이 생성되었습니다.");  //TODO response 수정
+    }
+
+    @PostMapping("/posts/{postId}/comments/{commentId}")
+    public ApiResponse<Void> createComment(@PathVariable Long postId,
+                                           @PathVariable Long commentId,
+                                           @Valid @RequestBody CommentRequestDTO requestDTO,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) { //TODO 인증객체에서 user 받기
+        commentService.createReply(postId, userDetails.getUserId(), requestDTO, commentId);
+        return ApiResponse.success(String.format("댓글 %d의 대댓글이 생성되었습니다.", postId));  //TODO response 수정
     }
 
     @GetMapping("/posts/{postId}/comments")
