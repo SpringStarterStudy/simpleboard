@@ -5,9 +5,12 @@ import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.Reaction;
+import com.study.simpleboard.mapper.PostMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
+import com.study.simpleboard.service.exception.PostNotFoundException;
 import com.study.simpleboard.service.exception.InvalidReactionException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +21,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostReactionService {
     private final PostReactionRepository postReactionRepository;
+    private final PostMapper postMapper;
 
     // like, dislike 활성화 상태 조회
     // 조회된 데이터가 존재하지 않을 경우 false로 처리 후 반환
     @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
     public PostReactionResp getReactionResponse(Long postId, Long userId) {
-        // TODO: 유효한 postId인지 post 테이블에서 조회한 후, 존재하지 않는 경우 예외 처리 추가
+        validatePostId(postId);
         List<Reaction> reactions = postReactionRepository.findAllReactions(postId, userId);
         PostReactionResp resp = PostReactionResp.createDefault();
 
@@ -42,26 +47,33 @@ public class PostReactionService {
     // 테이블에 데이터가 존재할 경우 update,
     // 존재하지 않을 경우 save
     @Transactional
-    public void saveReactionRequest(Long postId, PostReactionReq postReactionReq) {
-        // TODO: 유효한 postId인지 post 테이블에서 조회한 후, 존재하지 않는 경우 예외 처리 추가
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
+    public void saveReactionRequest(Long postId, Long userId, PostReactionReq postReactionReq) {
+        validatePostId(postId);
         ReactionType reactionType = getReactionType(postReactionReq);
-        Optional<Reaction> postReaction = findReaction(postId, postReactionReq, reactionType);
+        Optional<Reaction> postReaction = findReaction(postId, userId, reactionType);
         postReaction.ifPresentOrElse(
                 reaction -> updateReaction(postReactionReq, reaction),
-                () -> saveReaction(postId, postReactionReq)
+                () -> saveReaction(postId, userId, postReactionReq)
         );
     }
 
-    private Optional<Reaction> findReaction(Long postId, PostReactionReq postReactionReq, ReactionType reactionType) {
-        return postReactionRepository.findReaction(postId, postReactionReq.getUserId(), reactionType);
+    private void validatePostId(Long postId) {
+        if (!postMapper.existsById(postId)) {
+            throw new PostNotFoundException(ErrorCode.POST_NOT_FOUND);
+        }
+    }
+
+    private Optional<Reaction> findReaction(Long postId, Long userId, ReactionType reactionType) {
+        return postReactionRepository.findReaction(postId, userId, reactionType);
     }
 
     private void updateReaction(PostReactionReq postReactionReq, Reaction reaction) {
         postReactionRepository.updateActive(getChangedReaction(postReactionReq, reaction));
     }
 
-    private void saveReaction(Long postId, PostReactionReq postReactionReq) {
-        postReactionRepository.save(Reaction.of(postId, getReactionType(postReactionReq), postReactionReq));
+    private void saveReaction(Long postId, Long userId, PostReactionReq postReactionReq) {
+        postReactionRepository.save(Reaction.of(userId, postId, getReactionType(postReactionReq), postReactionReq));
     }
 
     // 입력된 값이 like인지 dislike인지 확인 후 알맞은 ReactionType 반환

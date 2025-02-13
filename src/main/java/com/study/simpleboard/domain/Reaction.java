@@ -30,9 +30,9 @@ public class Reaction {
                 .build();
     }
 
-    public static Reaction of(Long postId, ReactionType reactionType, PostReactionReq postReactionReq) {
+    public static Reaction of(Long userId, Long postId, ReactionType reactionType, PostReactionReq postReactionReq) {
         return Reaction.builder()
-                .userId(postReactionReq.getUserId())
+                .userId(userId)
                 .targetId(postId)
                 .targetType(TargetType.POST)
                 .reactionType(reactionType)

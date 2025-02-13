@@ -1,6 +1,7 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.service.PostReactionService;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +25,8 @@ public class PostReactionController {
     // 조회 성공 시 200 응답
     @GetMapping("/posts/{postId}/reaction")
     public ApiResponse<PostReactionResp> getReaction(@Positive @PathVariable Long postId,
-                                                     @Positive @RequestParam Long userId) {
-        // TODO: 로그인 인증 구현 후 userId 검증 수정
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userId);
+                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
+        PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userDetails.getUserId());
         return ApiResponse.success(reactionResponse);
     }
 
@@ -35,9 +36,9 @@ public class PostReactionController {
     // like와 dislike가 둘 다 존재할 경우 400 응답
     @PostMapping("/posts/{postId}/reaction")
     public ResponseEntity<Void> saveReaction(@Positive @PathVariable Long postId,
-                                             @Valid @RequestBody PostReactionReq postReactionReq) {
-        // TODO: 로그인 인증 구현 후 userId 검증 수정
-        postReactionService.saveReactionRequest(postId, postReactionReq);
+                                             @Valid @RequestBody PostReactionReq postReactionReq,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postReactionService.saveReactionRequest(postId, userDetails.getUserId(), postReactionReq);
         return ResponseEntity.noContent().build();
     }
 }
