@@ -36,9 +36,9 @@ public class CommentController {
     public ApiResponse<Void> createComment(@PathVariable Long postId,
                                            @PathVariable Long commentId,
                                            @Valid @RequestBody CommentRequestDTO requestDTO,
-                                           @AuthenticationPrincipal CustomUserDetails userDetails) { //TODO 인증객체에서 user 받기
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
         commentService.createReply(postId, userDetails.getUserId(), requestDTO, commentId);
-        return ApiResponse.success(String.format("댓글 %d의 대댓글이 생성되었습니다.", postId));  //TODO response 수정
+        return ApiResponse.success(String.format("댓글 %d의 대댓글이 생성되었습니다.", postId));
     }
 
     @GetMapping("/posts/{postId}/comments")

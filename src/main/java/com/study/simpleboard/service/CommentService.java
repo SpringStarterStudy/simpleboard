@@ -8,6 +8,8 @@ import com.study.simpleboard.dto.CommentResponseDTO;
 import com.study.simpleboard.dto.ReplyCreateDTO;
 import com.study.simpleboard.mapper.CommentMapper;
 import java.util.List;
+
+import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentMapper commentMapper;
+    private final PostMapper postMapper;
 
     @Transactional
     public void createComment(Long postId, Long userId, CommentRequestDTO requestDTO) {
@@ -28,7 +31,10 @@ public class CommentService {
 
     @Transactional
     public void createReply(Long postId, Long userId, CommentRequestDTO requestDTO, Long parentId) {
-        //TODO postId 유효성 검사
+        if (!postMapper.existsById(postId)) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
+
         commentMapper.insertReply(new ReplyCreateDTO(userId, postId,
                 requestDTO.getCommentContent(), parentId));
 
