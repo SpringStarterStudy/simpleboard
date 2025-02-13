@@ -35,6 +35,10 @@ public class CommentService {
             throw new CustomException(ErrorCode.POST_NOT_FOUND);
         }
 
+        if (!commentMapper.existsByCommentId(parentId)){
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
         commentMapper.insertReply(new ReplyCreateDTO(userId, postId,
                 requestDTO.getCommentContent(), parentId));
 
