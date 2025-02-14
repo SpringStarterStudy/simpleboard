@@ -11,6 +11,7 @@ import com.study.simpleboard.dto.User;
 import com.study.simpleboard.mapper.PostMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
 import com.study.simpleboard.service.exception.InvalidReactionException;
+import com.study.simpleboard.service.exception.PostNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,6 +123,25 @@ class PostReactionServiceTest {
         verify(postReactionRepository).findAllReactions(POST_ID, USER_ID);
     }
 
+    @DisplayName("like, dislike 활성화 상태 조회 - 존재하지 않는 postId일 경우")
+    @Test
+    void getReactionResponse_whenNotFoundPostId_shouldThrowException() {
+        // 조건: "존재하지 않는 postId"
+        // 기대 결과: "throw exception"
+
+        // Given: Mock 데이터 정의
+        when(postMapper.existsById(POST_ID)).thenReturn(false);
+
+        // When: Service 메서드 호출
+        // Then: 결과 검증
+        assertThatThrownBy(() -> postReactionService.getReactionResponse(POST_ID, USER_DETAILS))
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
+
+        // Then: Mapper 호출 검증
+        verify(postMapper).existsById(POST_ID);
+    }
+
     @DisplayName("like 또는 dislike 활성화 상태 갱신 - 데이터가 존재할 경우 updateActive 호출")
     @Test
     void saveReactionRequest_whenDataExists_shouldCallUpdateActive() {
@@ -208,8 +228,27 @@ class PostReactionServiceTest {
         verify(postReactionRepository,times(0)).findReaction(anyLong(), anyLong(), any(ReactionType.class));
     }
 
-    // TODO:
-    //  postId 검증 테스트 추가
+    @DisplayName("like 또는 dislike 활성화 상태 갱신 - 존재하지 않는 postId일 경우")
+    @Test
+    void saveReactionRequest_whenNotFoundPostId_shouldThrowException() {
+        // 조건: "존재하지 않는 postId"
+        // 기대 결과: "throw exception"
+
+        // Given: Mock 데이터 정의
+        boolean like = true;
+        Boolean dislike = null;
+        PostReactionReq mockReq = new PostReactionReq(like, dislike);
+        when(postMapper.existsById(POST_ID)).thenReturn(false);
+
+        // When: Service 메서드 호출
+        // Then: 결과 검증
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq))
+                .isInstanceOf(PostNotFoundException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
+
+        // Then: Mapper 호출 검증
+        verify(postMapper).existsById(POST_ID);
+    }
 
     private static Reaction getReaction(ReactionType reactionType, boolean active) {
         Reaction reaction = Reaction.builder()

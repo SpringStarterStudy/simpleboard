@@ -137,6 +137,24 @@ public class PostReactionIntegrationTest {
     }
 
     @Test
+    @DisplayName("like, dislike 활성화 여부 조회 - 존재하지 않는 postId일 경우")
+    void getReaction_whenNotFoundPostId_shouldThrowException() throws Exception {
+        // given
+        long invalidPostId = 10L;
+
+        // When
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/posts/{postId}/reaction", invalidPostId)
+        );
+
+        // then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(ErrorCode.POST_NOT_FOUND.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.POST_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
     @DisplayName("like 또는 dislike 활성화 상태에 대한 요청을 받아서 저장 - reaction 정보가 db에 없을 경우")
     void saveReactionRequest_whenNotExistReaction() throws Exception {
         // given
@@ -235,8 +253,28 @@ public class PostReactionIntegrationTest {
                 .andExpect(jsonPath("$.message").value(ErrorCode.INVALID_REACTION.getMessage()));
     }
 
-    // TODO: userId 검증 테스트 코드 추가
-    //  postId 검증 테스트 추가
+    @Test
+    @DisplayName("like 또는 dislike 활성화 상태에 대한 요청을 받아서 저장 - 존재하지 않는 postId일 경우")
+    void saveReactionRequest_whenNotFoundPostId_shouldThrowException() throws Exception {
+        // given
+        long invalidPostId = 10L;
+        boolean like = true;
+        Boolean dislike = null;
+        PostReactionReq mockRequest = new PostReactionReq(like, dislike);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts/{postId}/reaction", invalidPostId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(ErrorCode.POST_NOT_FOUND.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.POST_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.POST_NOT_FOUND.getMessage()));
+    }
 
     private static Reaction getReaction(ReactionType reactionType, boolean active) {
         return reactionType == ReactionType.LIKE
