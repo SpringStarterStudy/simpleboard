@@ -3,7 +3,7 @@
 <mapper namespace="com.study.simpleboard.mapper.PostMapper">
 
     <!-- 전체 게시물 조회 -->
-    <select id="selectAllPosts" resultType="com.study.simpleboard.dto.PostResponseDTO$PostList">
+    <select id="selectAllPosts" resultType="com.study.simpleboard.dto.response.PostResponseDTO$PostList">
         SELECT
             post_id AS id,
             user_id AS userId,
@@ -13,7 +13,7 @@
         FROM post
         WHERE deleted_at IS NULL
         <if test="searchKeyword != null and searchKeyword != ''">
-            AND post_content LIKE CONCAT('%', #{searchKeyword}, '%')
+            AND MATCH(post_title, post_content) AGAINST(CONCAT('+', #{searchKeyword}, '*') IN BOOLEAN MODE)
         </if>
         <if test="searchUser != null and searchUser != ''">
             AND user_id = #{searchUser}
@@ -30,7 +30,7 @@
         FROM post
         WHERE deleted_at IS NULL
         <if test="searchKeyword != null and searchKeyword != ''">
-            AND post_content LIKE concat('%', #{searchKeyword}, '%')
+            AND MATCH(post_title, post_content) AGAINST(CONCAT('+', #{searchKeyword}, '*') IN BOOLEAN MODE)
         </if>
         <if test="searchUser != null and searchUser != ''">
             AND user_id = #{searchUser}
@@ -42,7 +42,7 @@
         VALUES(#{post.userId}, #{post.title}, #{post.content})
     </insert>
 
-    <select id="selectPostById" resultType="com.study.simpleboard.dto.PostResponseDTO$PostDetail">
+    <select id="selectPostById" resultType="com.study.simpleboard.dto.response.PostResponseDTO$PostDetail">
         SELECT
             post_id AS id,
             user_id AS userId,
