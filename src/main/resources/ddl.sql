@@ -22,3 +22,5 @@ DROP FOREIGN KEY FK_user_TO_reaction_1,
 ADD CONSTRAINT FK_user_TO_reaction_cascade
 FOREIGN KEY (user_id) REFERENCES user(user_id)
 ON DELETE CASCADE;
+
+CREATE FULLTEXT INDEX idx_title_content ON post(post_title, post_content);
