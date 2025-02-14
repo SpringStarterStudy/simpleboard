@@ -26,7 +26,7 @@ public class PostReactionController {
     @GetMapping("/posts/{postId}/reaction")
     public ApiResponse<PostReactionResp> getReaction(@Positive @PathVariable Long postId,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userDetails.getUserId());
+        PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userDetails);
         return ApiResponse.success(reactionResponse);
     }
 
@@ -38,7 +38,7 @@ public class PostReactionController {
     public ResponseEntity<Void> saveReaction(@Positive @PathVariable Long postId,
                                              @Valid @RequestBody PostReactionReq postReactionReq,
                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-        postReactionService.saveReactionRequest(postId, userDetails.getUserId(), postReactionReq);
+        postReactionService.saveReactionRequest(postId, userDetails, postReactionReq);
         return ResponseEntity.noContent().build();
     }
 }

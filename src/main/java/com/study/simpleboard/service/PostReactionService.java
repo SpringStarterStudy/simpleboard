@@ -2,6 +2,7 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.enums.ReactionType;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.Reaction;
@@ -25,10 +26,10 @@ public class PostReactionService {
     // like, dislike 활성화 상태 조회
     // 조회된 데이터가 존재하지 않을 경우 false로 반환
     @Transactional(readOnly = true)
-    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
-    public PostReactionResp getReactionResponse(Long postId, Long userId) {
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userDetails.userId")
+    public PostReactionResp getReactionResponse(Long postId, CustomUserDetails userDetails) {
         validatePostId(postId);
-        List<Reaction> reactions = postReactionRepository.findAllReactions(postId, userId);
+        List<Reaction> reactions = postReactionRepository.findAllReactions(postId, userDetails.getUserId());
         return PostReactionResp.from(reactions);
     }
 
@@ -36,9 +37,10 @@ public class PostReactionService {
     // 테이블에 데이터가 존재할 경우 update,
     // 존재하지 않을 경우 save
     @Transactional
-    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
-    public void saveReactionRequest(Long postId, Long userId, PostReactionReq postReactionReq) {
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userDetails.userId")
+    public void saveReactionRequest(Long postId, CustomUserDetails userDetails, PostReactionReq postReactionReq) {
         validatePostId(postId);
+        Long userId = userDetails.getUserId();
         ReactionType reactionType = ReactionType.getReactionType(postReactionReq);
         Optional<Reaction> postReaction = postReactionRepository.findReaction(postId, userId, reactionType);
         postReaction.ifPresentOrElse(
