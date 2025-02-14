@@ -1,7 +1,7 @@
 package com.study.simpleboard.mapper;
 
 import com.study.simpleboard.dto.CommentCreateDTO;
-import com.study.simpleboard.dto.CommentResponseDTO;
+import com.study.simpleboard.dto.response.CommentResponseDTO;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
