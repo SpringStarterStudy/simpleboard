@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Mapper
 public interface PostMapper {
-    // 게시물 전체 목록 조회
+
     List<PostResponseDTO.PostList> selectAllPosts(
             @Param("offset") int offset,
             @Param("pageSize") int pageSize,
