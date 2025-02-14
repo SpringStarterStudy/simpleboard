@@ -3,6 +3,7 @@ package com.study.simpleboard.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -16,7 +17,7 @@ public class PostResponseDTO {
         private Long id;
         private Long userId;
         private String title;
-        private String createdAt;
+        private LocalDateTime createdAt;
         private Long viewCount;
     }
 
@@ -31,24 +32,32 @@ public class PostResponseDTO {
         private long totalPostsCount;   // 전체 게시물 수
         private Integer totalPages;     // 전체 페이지의 수
         private Integer pageGroupSize;  // 페이지 그룹의 크기 (default:5)
-    }
 
-    // 검색 조건과 페이징 정보
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class SearchRequest {
-        @Min(value = 1, message = "페이지는 1부터 시작합니다.")
-        private Integer page = 1;
+        public static <T> PostsAndPageResponse<T> of(
+                List<PostList> postList, int currentPage, int currentSize, int postPerPage,
+                long totalPostsCount, int totalPages, int pageGroupSize
+        ) {
+            return PostsAndPageResponse.<T>builder()
+                    .postList(postList)
+                    .currentPage(currentPage)
+                    .currentSize(currentSize)
+                    .postPerPage(postPerPage)
+                    .totalPostsCount(totalPostsCount)
+                    .totalPages(totalPages)
+                    .pageGroupSize(pageGroupSize)
+                    .build();
+        }
 
-        @Min(value = 1, message = "사이즈는 최소 1 이상이어야 합니다.")
-        private Integer size = 10;
-
-        private String searchKeyword = "";
-        private String searchUser = "";
-
-        public Pageable toPageable() {
-            return PageRequest.of(page - 1, size);
+        public static <T> PostsAndPageResponse<T> empty(Pageable pageable, int pageGroupSize) {
+            return PostsAndPageResponse.<T>builder()
+                    .postList(List.of()) // 빈 리스트 반환
+                    .currentPage(pageable.getPageNumber() + 1)
+                    .currentSize(0)
+                    .postPerPage(pageable.getPageSize())
+                    .totalPostsCount(0L)
+                    .totalPages(0)
+                    .pageGroupSize(pageGroupSize)
+                    .build();
         }
     }
 
