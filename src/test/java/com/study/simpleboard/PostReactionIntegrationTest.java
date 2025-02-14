@@ -7,8 +7,10 @@ import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.mapper.UserMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -45,9 +49,16 @@ public class PostReactionIntegrationTest {
     @Autowired
     private PostReactionRepository postReactionRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        CustomUserDetails userDetails = createUserDetails();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
     }
 
     @Test
@@ -61,7 +72,6 @@ public class PostReactionIntegrationTest {
         // When
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/posts/{postId}/reaction", POST_ID)
-                        .param("userId", String.valueOf(USER_ID))
         );
 
         // Then
@@ -91,7 +101,6 @@ public class PostReactionIntegrationTest {
         // When
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/posts/{postId}/reaction", POST_ID)
-                        .param("userId", String.valueOf(USER_ID))
         );
 
         // Then
@@ -118,9 +127,9 @@ public class PostReactionIntegrationTest {
         // When
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/posts/{postId}/reaction", invalidPostId)
-                        .param("userId", String.valueOf(USER_ID))
         );
 
+        // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
                 .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
@@ -133,7 +142,7 @@ public class PostReactionIntegrationTest {
         // given
         Boolean like = null;
         Boolean dislike = true;
-        PostReactionReq mockRequest = new PostReactionReq(USER_ID, like, dislike);
+        PostReactionReq mockRequest = new PostReactionReq(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -161,7 +170,7 @@ public class PostReactionIntegrationTest {
         boolean beforeDislike = true;
         boolean afterDislike = false;
         postReactionRepository.save(getReaction(ReactionType.DISLIKE, beforeDislike));
-        PostReactionReq mockRequest = new PostReactionReq(USER_ID, null, afterDislike);
+        PostReactionReq mockRequest = new PostReactionReq(null, afterDislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -188,7 +197,7 @@ public class PostReactionIntegrationTest {
         // given
         Boolean like = null;
         Boolean dislike = null;
-        PostReactionReq invalidRequest = new PostReactionReq(USER_ID, like, dislike);
+        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -210,7 +219,7 @@ public class PostReactionIntegrationTest {
         // given
         boolean like = true;
         boolean dislike = false;
-        PostReactionReq invalidRequest = new PostReactionReq(USER_ID, like, dislike);
+        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -231,7 +240,11 @@ public class PostReactionIntegrationTest {
 
     private static Reaction getReaction(ReactionType reactionType, boolean active) {
         return reactionType == ReactionType.LIKE
-                ? Reaction.of(POST_ID, reactionType, new PostReactionReq(USER_ID, active, null))
-                : Reaction.of(POST_ID, reactionType, new PostReactionReq(USER_ID, null, active));
+                ? Reaction.of(USER_ID, POST_ID, new PostReactionReq(active, null))
+                : Reaction.of(USER_ID, POST_ID, new PostReactionReq(null, active));
+    }
+
+    private CustomUserDetails createUserDetails() {
+        return new CustomUserDetails(userMapper.findById(1L).get());
     }
 }

@@ -1,10 +1,10 @@
 package com.study.simpleboard.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.service.PostReactionService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -17,12 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -30,26 +26,21 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class PostReactionControllerTest {
     private final static long USER_ID = 1L;
-    private final static long POST_ID = 15L;
-    private final static Gson gson = new Gson();
+    private final static long POST_ID = 1L;
 
     @Mock
     private PostReactionService postReactionService;
 
     @InjectMocks
     private PostReactionController postReactionController;
-    private MockMvc mockMvc;
     private Validator validator;
 
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(postReactionController).build();
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
@@ -61,23 +52,13 @@ class PostReactionControllerTest {
         when(postReactionService.getReactionResponse(POST_ID, USER_ID)).thenReturn(mockResponse);
 
         // When
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/posts/{postId}/reaction", POST_ID)
-                        .param("userId", String.valueOf(USER_ID))
-        );
+        ApiResponse<PostReactionResp> response = postReactionController.getReaction(POST_ID, createUserDetails());
 
         // Then
-        MvcResult mvcResult = resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.message").value("success"))
-                .andExpect(jsonPath("$.data.like").exists()) // "like" 필드 존재 확인
-                .andExpect(jsonPath("$.data.like.active").value(true)) // "like.active" 값 확인
-                .andExpect(jsonPath("$.data.dislike").exists()) // "dislike" 필드 존재 확인
-                .andExpect(jsonPath("$.data.dislike.active").value(false)) // "dislike.active" 값 확인
-                .andReturn();
-        ApiResponse<PostReactionResp> response = gson.fromJson(
-                mvcResult.getResponse().getContentAsString(),
-                TypeToken.getParameterized(ApiResponse.class, PostReactionResp.class).getType());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getMessage()).isEqualTo("success");
+        assertThat(response.getData()).isNotNull();
         assertThat(response.getData()).isEqualTo(mockResponse);
         verify(postReactionService).getReactionResponse(POST_ID, USER_ID);
     }
@@ -89,15 +70,11 @@ class PostReactionControllerTest {
         PostReactionReq mockRequest = getRequest();
 
         // When
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/posts/{postId}/reaction", POST_ID)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(mockRequest))
-        );
+        ResponseEntity<Void> response = postReactionController.saveReaction(POST_ID, mockRequest, createUserDetails());
 
         // Then
-        resultActions.andExpect(status().isNoContent());
-        verify(postReactionService).saveReactionRequest(POST_ID, mockRequest);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(postReactionService).saveReactionRequest(POST_ID, USER_ID, mockRequest);
     }
 
     @DisplayName("like, dislike 활성화 여부 조회 - postId가 양수가 아닐 경우")
@@ -107,8 +84,8 @@ class PostReactionControllerTest {
         long invalidPostId = 0L;
 
         // when
-        Method getReaction = PostReactionController.class.getMethod("getReaction", Long.class, Long.class);
-        Long[] parameterValues = { invalidPostId, USER_ID };
+        Method getReaction = PostReactionController.class.getMethod("getReaction", Long.class, CustomUserDetails.class);
+        Object[] parameterValues = { invalidPostId, createUserDetails() };
         Set<ConstraintViolation<PostReactionController>> violations = validator.forExecutables()
                 .validateParameters(
                         new PostReactionController(postReactionService), getReaction, parameterValues);
@@ -118,8 +95,16 @@ class PostReactionControllerTest {
         assertThat(violations).anyMatch(violation -> violation.getMessage().contains("0보다 커야 합니다"));
     }
 
+    private static CustomUserDetails createUserDetails() {
+        User user = User.createLocalUser("hong@naver.com",
+                "$2a$10$eXthWEeajRbGgRfvlfVBl.LlD6jDWoyAgyRSDa.FdRUTM4vfnYh86",
+                "홍길동", "01012345678");
+        ReflectionTestUtils.setField(user, "userId", USER_ID);
+        return new CustomUserDetails(user);
+    }
+
     private PostReactionReq getRequest() {
-        return new PostReactionReq(USER_ID, null, true);
+        return new PostReactionReq(null, true);
     }
 
     private PostReactionResp getResponse() {
