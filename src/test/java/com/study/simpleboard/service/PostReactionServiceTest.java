@@ -2,10 +2,12 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.Reaction;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostReactionReq;
 import com.study.simpleboard.dto.PostReactionResp;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.mapper.PostMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
 import com.study.simpleboard.service.exception.InvalidReactionException;
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.*;
 class PostReactionServiceTest {
     private final static Long USER_ID = 1L;
     private final static Long POST_ID = 1L;
+    private final static CustomUserDetails USER_DETAILS = createUserDetails();
 
     @Mock
     private PostReactionRepository postReactionRepository;
@@ -38,6 +41,14 @@ class PostReactionServiceTest {
 
     @InjectMocks
     private PostReactionService postReactionService;
+
+    private static CustomUserDetails createUserDetails() {
+        User user = User.createLocalUser("hong@naver.com",
+                "$2a$10$eXthWEeajRbGgRfvlfVBl.LlD6jDWoyAgyRSDa.FdRUTM4vfnYh86",
+                "홍길동", "01012345678");
+        ReflectionTestUtils.setField(user, "userId", USER_ID);
+        return new CustomUserDetails(user);
+    }
 
     @DisplayName("like, dislike 활성화 상태 조회 - like와 dislike 둘 다 존재할 경우")
     @Test
@@ -54,7 +65,7 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_ID);
+        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
         PostReactionResp resp = PostReactionResp.createDefault()
@@ -79,7 +90,7 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_ID);
+        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
         PostReactionResp resp = PostReactionResp.createDefault().changeLike(like);
@@ -101,7 +112,7 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_ID);
+        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
         PostReactionResp resp = PostReactionResp.createDefault();
@@ -126,7 +137,7 @@ class PostReactionServiceTest {
         when(postReactionRepository.findReaction(POST_ID, USER_ID, ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
-        postReactionService.saveReactionRequest(POST_ID, USER_ID, mockReq);
+        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findReaction(POST_ID, USER_ID, ReactionType.LIKE);
@@ -148,7 +159,7 @@ class PostReactionServiceTest {
         when(postReactionRepository.findReaction(POST_ID, USER_ID, ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
-        postReactionService.saveReactionRequest(POST_ID, USER_ID, mockReq);
+        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findReaction(POST_ID, USER_ID, ReactionType.LIKE);
@@ -168,7 +179,7 @@ class PostReactionServiceTest {
         when(postMapper.existsById(POST_ID)).thenReturn(true);
 
         // When: Service 메서드 호출
-        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_ID, invalidRequest))
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, invalidRequest))
                 .isInstanceOf(InvalidReactionException.class)
                 .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);
@@ -189,7 +200,7 @@ class PostReactionServiceTest {
         when(postMapper.existsById(POST_ID)).thenReturn(true);
 
         // When: Service 메서드 호출
-        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_ID, invalidRequest))
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, invalidRequest))
                 .isInstanceOf(InvalidReactionException.class)
                 .hasMessage(ErrorCode.INVALID_REACTION.getMessage())
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_REACTION);

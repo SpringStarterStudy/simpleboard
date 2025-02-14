@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 class PostReactionControllerTest {
     private final static long USER_ID = 1L;
     private final static long POST_ID = 1L;
+    private final static CustomUserDetails USER_DETAILS = createUserDetails();
 
     @Mock
     private PostReactionService postReactionService;
@@ -44,15 +45,23 @@ class PostReactionControllerTest {
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
+    private static CustomUserDetails createUserDetails() {
+        User user = User.createLocalUser("hong@naver.com",
+                "$2a$10$eXthWEeajRbGgRfvlfVBl.LlD6jDWoyAgyRSDa.FdRUTM4vfnYh86",
+                "홍길동", "01012345678");
+        ReflectionTestUtils.setField(user, "userId", USER_ID);
+        return new CustomUserDetails(user);
+    }
+
     @DisplayName("like, dislike 활성화 여부 조회")
     @Test
     void getReaction() throws Exception {
         // Given: Mock 데이터 정의
         PostReactionResp mockResponse = getResponse();
-        when(postReactionService.getReactionResponse(POST_ID, USER_ID)).thenReturn(mockResponse);
+        when(postReactionService.getReactionResponse(POST_ID, USER_DETAILS)).thenReturn(mockResponse);
 
         // When
-        ApiResponse<PostReactionResp> response = postReactionController.getReaction(POST_ID, createUserDetails());
+        ApiResponse<PostReactionResp> response = postReactionController.getReaction(POST_ID, USER_DETAILS);
 
         // Then
         assertThat(response).isNotNull();
@@ -60,7 +69,7 @@ class PostReactionControllerTest {
         assertThat(response.getMessage()).isEqualTo("success");
         assertThat(response.getData()).isNotNull();
         assertThat(response.getData()).isEqualTo(mockResponse);
-        verify(postReactionService).getReactionResponse(POST_ID, USER_ID);
+        verify(postReactionService).getReactionResponse(POST_ID, USER_DETAILS);
     }
 
     @DisplayName("like 또는 dislike 활성화 상태에 대한 요청을 받아서 저장")
@@ -70,11 +79,11 @@ class PostReactionControllerTest {
         PostReactionReq mockRequest = getRequest();
 
         // When
-        ResponseEntity<Void> response = postReactionController.saveReaction(POST_ID, mockRequest, createUserDetails());
+        ResponseEntity<Void> response = postReactionController.saveReaction(POST_ID, mockRequest, USER_DETAILS);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(postReactionService).saveReactionRequest(POST_ID, USER_ID, mockRequest);
+        verify(postReactionService).saveReactionRequest(POST_ID, USER_DETAILS, mockRequest);
     }
 
     @DisplayName("like, dislike 활성화 여부 조회 - postId가 양수가 아닐 경우")
@@ -85,7 +94,7 @@ class PostReactionControllerTest {
 
         // when
         Method getReaction = PostReactionController.class.getMethod("getReaction", Long.class, CustomUserDetails.class);
-        Object[] parameterValues = { invalidPostId, createUserDetails() };
+        Object[] parameterValues = { invalidPostId, USER_DETAILS };
         Set<ConstraintViolation<PostReactionController>> violations = validator.forExecutables()
                 .validateParameters(
                         new PostReactionController(postReactionService), getReaction, parameterValues);
@@ -93,14 +102,6 @@ class PostReactionControllerTest {
         // then
         assertThat(violations).isNotEmpty();    // 예외 발생
         assertThat(violations).anyMatch(violation -> violation.getMessage().contains("0보다 커야 합니다"));
-    }
-
-    private static CustomUserDetails createUserDetails() {
-        User user = User.createLocalUser("hong@naver.com",
-                "$2a$10$eXthWEeajRbGgRfvlfVBl.LlD6jDWoyAgyRSDa.FdRUTM4vfnYh86",
-                "홍길동", "01012345678");
-        ReflectionTestUtils.setField(user, "userId", USER_ID);
-        return new CustomUserDetails(user);
     }
 
     private PostReactionReq getRequest() {
