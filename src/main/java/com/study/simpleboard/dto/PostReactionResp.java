@@ -1,9 +1,13 @@
 package com.study.simpleboard.dto;
 
+import com.study.simpleboard.domain.Reaction;
+import com.study.simpleboard.domain.enums.ReactionType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -12,8 +16,20 @@ public class PostReactionResp {
     private final LikeDislikeStatus like;
     private final LikeDislikeStatus dislike;
 
+    public static PostReactionResp from(List<Reaction> reactions) {
+        PostReactionResp resp = createDefault();
+        for(Reaction reaction : reactions) {
+            resp = resp.changeStatus(reaction.getActive(), reaction.getReactionType());
+        }
+        return resp;
+    }
+
     public static PostReactionResp createDefault() {
         return new PostReactionResp(LikeDislikeStatus.createFalse(), LikeDislikeStatus.createFalse());
+    }
+
+    public PostReactionResp changeStatus(boolean active, ReactionType reactionType) {
+        return reactionType == ReactionType.LIKE ? changeLike(active) : changeDislike(active);
     }
 
     public PostReactionResp changeLike(boolean active) {

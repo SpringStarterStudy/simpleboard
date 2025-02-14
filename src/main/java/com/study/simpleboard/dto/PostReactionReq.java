@@ -1,7 +1,7 @@
 package com.study.simpleboard.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.service.exception.InvalidReactionException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,13 @@ public class PostReactionReq {
         return dislike != null;
     }
 
-    public boolean isInvalid() {
+    public void validate() {
+        if (isInvalid()) {
+            throw new InvalidReactionException(ErrorCode.INVALID_REACTION);
+        }
+    }
+
+    private boolean isInvalid() {
         return !hasLike() && !hasDislike() || hasLike() && hasDislike();
     }
 
