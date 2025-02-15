@@ -1,4 +1,4 @@
-package com.study.simpleboard.dto;
+package com.study.simpleboard.dto.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

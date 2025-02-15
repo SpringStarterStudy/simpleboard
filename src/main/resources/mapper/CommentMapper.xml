@@ -15,7 +15,7 @@
     )
   </select>
 
-  <select id="selectCommentList" resultType="com.study.simpleboard.dto.CommentResponseDTO" parameterType="long">
+  <select id="selectCommentList" resultType="com.study.simpleboard.dto.response.CommentResponseDTO" parameterType="long">
     SELECT c.comment_id, c.user_id, c.post_id, c.parent_comment_id, c.comment_content, c.created_at
     FROM comment c
     WHERE c.post_id = #{postId} AND c.deleted_at IS NULL
