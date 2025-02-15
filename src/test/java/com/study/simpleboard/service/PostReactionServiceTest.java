@@ -3,8 +3,8 @@ package com.study.simpleboard.service;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.PostReactionReq;
-import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.request.PostReactionRequest;
+import com.study.simpleboard.dto.response.PostReactionResponse;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.dto.User;
@@ -66,13 +66,13 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
+        PostReactionResponse reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
-        PostReactionResp resp = PostReactionResp.createDefault()
+        PostReactionResponse response = PostReactionResponse.createDefault()
                 .changeLike(like)
                 .changeDislike(dislike);
-        assertThat(reactionResponse).isEqualTo(resp);
+        assertThat(reactionResponse).isEqualTo(response);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findAllReactions(POST_ID, USER_ID);
@@ -91,11 +91,11 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
+        PostReactionResponse reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
-        PostReactionResp resp = PostReactionResp.createDefault().changeLike(like);
-        assertThat(reactionResponse).isEqualTo(resp);
+        PostReactionResponse response = PostReactionResponse.createDefault().changeLike(like);
+        assertThat(reactionResponse).isEqualTo(response);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findAllReactions(POST_ID, USER_ID);
@@ -113,11 +113,11 @@ class PostReactionServiceTest {
         when(postReactionRepository.findAllReactions(POST_ID, USER_ID)).thenReturn(mockReactions);
 
         // When: Service 메서드 호출
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
+        PostReactionResponse reactionResponse = postReactionService.getReactionResponse(POST_ID, USER_DETAILS);
 
         // Then: 결과 검증
-        PostReactionResp resp = PostReactionResp.createDefault();
-        assertThat(reactionResponse).isEqualTo(resp);
+        PostReactionResponse response = PostReactionResponse.createDefault();
+        assertThat(reactionResponse).isEqualTo(response);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findAllReactions(POST_ID, USER_ID);
@@ -151,13 +151,13 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         boolean like = true;
         Boolean dislike = null;
-        PostReactionReq mockReq = new PostReactionReq(like, dislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(like, dislike);
         Optional<Reaction> mockReaction = Optional.of(getReaction(ReactionType.LIKE, like));
         when(postMapper.existsById(POST_ID)).thenReturn(true);
         when(postReactionRepository.findReaction(POST_ID, USER_ID, ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
-        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq);
+        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockRequest);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findReaction(POST_ID, USER_ID, ReactionType.LIKE);
@@ -173,13 +173,13 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         boolean like = true;
         Boolean dislike = null;
-        PostReactionReq mockReq = new PostReactionReq(like, dislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(like, dislike);
         Optional<Reaction> mockReaction = Optional.empty();
         when(postMapper.existsById(POST_ID)).thenReturn(true);
         when(postReactionRepository.findReaction(POST_ID, USER_ID, ReactionType.LIKE)).thenReturn(mockReaction);
 
         // When: Service 메서드 호출
-        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq);
+        postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockRequest);
 
         // Then: Mapper 호출 검증
         verify(postReactionRepository).findReaction(POST_ID, USER_ID, ReactionType.LIKE);
@@ -195,7 +195,7 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         Boolean like = null;
         Boolean dislike = null;
-        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest invalidRequest = new PostReactionRequest(like, dislike);
         when(postMapper.existsById(POST_ID)).thenReturn(true);
 
         // When: Service 메서드 호출
@@ -216,7 +216,7 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         boolean like = true;
         boolean dislike = true;
-        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest invalidRequest = new PostReactionRequest(like, dislike);
         when(postMapper.existsById(POST_ID)).thenReturn(true);
 
         // When: Service 메서드 호출
@@ -237,12 +237,12 @@ class PostReactionServiceTest {
         // Given: Mock 데이터 정의
         boolean like = true;
         Boolean dislike = null;
-        PostReactionReq mockReq = new PostReactionReq(like, dislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(like, dislike);
         when(postMapper.existsById(POST_ID)).thenReturn(false);
 
         // When: Service 메서드 호출
         // Then: 결과 검증
-        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockReq))
+        assertThatThrownBy(() -> postReactionService.saveReactionRequest(POST_ID, USER_DETAILS, mockRequest))
                 .isInstanceOf(PostNotFoundException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
 

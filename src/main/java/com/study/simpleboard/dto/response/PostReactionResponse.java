@@ -1,4 +1,4 @@
-package com.study.simpleboard.dto;
+package com.study.simpleboard.dto.response;
 
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.domain.enums.ReactionType;
@@ -12,32 +12,32 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
-public class PostReactionResp {
+public class PostReactionResponse {
     private final LikeDislikeStatus like;
     private final LikeDislikeStatus dislike;
 
-    public static PostReactionResp from(List<Reaction> reactions) {
-        PostReactionResp resp = createDefault();
+    public static PostReactionResponse from(List<Reaction> reactions) {
+        PostReactionResponse response = createDefault();
         for(Reaction reaction : reactions) {
-            resp = resp.changeStatus(reaction.getActive(), reaction.getReactionType());
+            response = response.changeStatus(reaction.getActive(), reaction.getReactionType());
         }
-        return resp;
+        return response;
     }
 
-    public static PostReactionResp createDefault() {
-        return new PostReactionResp(LikeDislikeStatus.createFalse(), LikeDislikeStatus.createFalse());
+    public static PostReactionResponse createDefault() {
+        return new PostReactionResponse(LikeDislikeStatus.createFalse(), LikeDislikeStatus.createFalse());
     }
 
-    public PostReactionResp changeStatus(boolean active, ReactionType reactionType) {
+    public PostReactionResponse changeStatus(boolean active, ReactionType reactionType) {
         return reactionType == ReactionType.LIKE ? changeLike(active) : changeDislike(active);
     }
 
-    public PostReactionResp changeLike(boolean active) {
-        return new PostReactionResp(LikeDislikeStatus.of(active), this.dislike);
+    public PostReactionResponse changeLike(boolean active) {
+        return new PostReactionResponse(LikeDislikeStatus.of(active), this.dislike);
     }
 
-    public PostReactionResp changeDislike(boolean active) {
-        return new PostReactionResp(this.like, LikeDislikeStatus.of(active));
+    public PostReactionResponse changeDislike(boolean active) {
+        return new PostReactionResponse(this.like, LikeDislikeStatus.of(active));
     }
 
     @Getter

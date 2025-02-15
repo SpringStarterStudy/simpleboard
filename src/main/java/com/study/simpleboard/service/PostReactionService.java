@@ -3,8 +3,8 @@ package com.study.simpleboard.service;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.PostReactionReq;
-import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.request.PostReactionRequest;
+import com.study.simpleboard.dto.response.PostReactionResponse;
 import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.mapper.PostMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
@@ -27,10 +27,10 @@ public class PostReactionService {
     // 조회된 데이터가 존재하지 않을 경우 false로 반환
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userDetails.userId")
-    public PostReactionResp getReactionResponse(Long postId, CustomUserDetails userDetails) {
+    public PostReactionResponse getReactionResponse(Long postId, CustomUserDetails userDetails) {
         validatePostId(postId);
         List<Reaction> reactions = postReactionRepository.findAllReactions(postId, userDetails.getUserId());
-        return PostReactionResp.from(reactions);
+        return PostReactionResponse.from(reactions);
     }
 
     // like 또는 dislike 활성화 상태 갱신
@@ -38,14 +38,14 @@ public class PostReactionService {
     // 존재하지 않을 경우 save
     @Transactional
     @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userDetails.userId")
-    public void saveReactionRequest(Long postId, CustomUserDetails userDetails, PostReactionReq postReactionReq) {
+    public void saveReactionRequest(Long postId, CustomUserDetails userDetails, PostReactionRequest postReactionRequest) {
         validatePostId(postId);
         Long userId = userDetails.getUserId();
-        ReactionType reactionType = ReactionType.getReactionType(postReactionReq);
+        ReactionType reactionType = ReactionType.getReactionType(postReactionRequest);
         Optional<Reaction> postReaction = postReactionRepository.findReaction(postId, userId, reactionType);
         postReaction.ifPresentOrElse(
-                reaction -> postReactionRepository.updateActive(changeActive(postReactionReq, reaction)),
-                () -> postReactionRepository.save(Reaction.of(userId, postId, postReactionReq))
+                reaction -> postReactionRepository.updateActive(changeActive(postReactionRequest, reaction)),
+                () -> postReactionRepository.save(Reaction.of(userId, postId, postReactionRequest))
         );
     }
 
@@ -57,7 +57,7 @@ public class PostReactionService {
     }
 
     // 조회된 객체에서 reaction 활성화 상태만 변경한 후 반환
-    private static Reaction changeActive(PostReactionReq postReactionReq, Reaction reaction) {
-        return reaction.changeActive(postReactionReq.getActive());
+    private static Reaction changeActive(PostReactionRequest postReactionRequest, Reaction reaction) {
+        return reaction.changeActive(postReactionRequest.getActive());
     }
 }

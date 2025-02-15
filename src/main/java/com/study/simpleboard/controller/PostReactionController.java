@@ -2,8 +2,8 @@ package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.PostReactionReq;
-import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.request.PostReactionRequest;
+import com.study.simpleboard.dto.response.PostReactionResponse;
 import com.study.simpleboard.service.PostReactionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -24,9 +24,9 @@ public class PostReactionController {
     // 검증 실패 시 400 응답
     // 조회 성공 시 200 응답
     @GetMapping("/posts/{postId}/reaction")
-    public ApiResponse<PostReactionResp> getReaction(@Positive @PathVariable Long postId,
-                                                     @AuthenticationPrincipal CustomUserDetails userDetails) {
-        PostReactionResp reactionResponse = postReactionService.getReactionResponse(postId, userDetails);
+    public ApiResponse<PostReactionResponse> getReaction(@Positive @PathVariable Long postId,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetails) {
+        PostReactionResponse reactionResponse = postReactionService.getReactionResponse(postId, userDetails);
         return ApiResponse.success(reactionResponse);
     }
 
@@ -36,9 +36,9 @@ public class PostReactionController {
     // like와 dislike가 둘 다 존재할 경우 400 응답
     @PostMapping("/posts/{postId}/reaction")
     public ResponseEntity<Void> saveReaction(@Positive @PathVariable Long postId,
-                                             @Valid @RequestBody PostReactionReq postReactionReq,
+                                             @Valid @RequestBody PostReactionRequest postReactionRequest,
                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
-        postReactionService.saveReactionRequest(postId, userDetails, postReactionReq);
+        postReactionService.saveReactionRequest(postId, userDetails, postReactionRequest);
         return ResponseEntity.noContent().build();
     }
 }

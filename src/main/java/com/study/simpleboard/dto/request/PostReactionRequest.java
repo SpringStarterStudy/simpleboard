@@ -1,4 +1,4 @@
-package com.study.simpleboard.dto;
+package com.study.simpleboard.dto.request;
 
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.service.exception.InvalidReactionException;
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class PostReactionReq {
+public class PostReactionRequest {
     private final Boolean like;
     private final Boolean dislike;
 

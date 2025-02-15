@@ -8,8 +8,8 @@ import com.study.simpleboard.domain.Reaction;
 import com.study.simpleboard.domain.enums.ReactionType;
 import com.study.simpleboard.domain.enums.TargetType;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.PostReactionReq;
-import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.request.PostReactionRequest;
+import com.study.simpleboard.dto.response.PostReactionResponse;
 import com.study.simpleboard.mapper.UserMapper;
 import com.study.simpleboard.repository.PostReactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +67,7 @@ public class PostReactionIntegrationTest {
         // given
         boolean like = false;
         boolean dislike = false;
-        PostReactionResp mockResponse = PostReactionResp.createDefault();
+        PostReactionResponse mockResponse = PostReactionResponse.createDefault();
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -83,9 +83,9 @@ public class PostReactionIntegrationTest {
                 .andExpect(jsonPath("$.data.dislike").exists()) // "dislike" 필드 존재 확인
                 .andExpect(jsonPath("$.data.dislike.active").value(dislike)) // "dislike.active" 값 확인
                 .andReturn();
-        ApiResponse<PostReactionResp> response = gson.fromJson(
+        ApiResponse<PostReactionResponse> response = gson.fromJson(
                 mvcResult.getResponse().getContentAsString(),
-                TypeToken.getParameterized(ApiResponse.class, PostReactionResp.class).getType());
+                TypeToken.getParameterized(ApiResponse.class, PostReactionResponse.class).getType());
         assertThat(response.getData()).isEqualTo(mockResponse);
     }
 
@@ -96,7 +96,7 @@ public class PostReactionIntegrationTest {
         boolean like = true;
         boolean dislike = false;
         postReactionRepository.save(getReaction(ReactionType.LIKE, like));
-        PostReactionResp mockResponse = PostReactionResp.createDefault().changeLike(like);
+        PostReactionResponse mockResponse = PostReactionResponse.createDefault().changeLike(like);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -112,9 +112,9 @@ public class PostReactionIntegrationTest {
                 .andExpect(jsonPath("$.data.dislike").exists()) // "dislike" 필드 존재 확인
                 .andExpect(jsonPath("$.data.dislike.active").value(dislike)) // "dislike.active" 값 확인
                 .andReturn();
-        ApiResponse<PostReactionResp> response = gson.fromJson(
+        ApiResponse<PostReactionResponse> response = gson.fromJson(
                 mvcResult.getResponse().getContentAsString(),
-                TypeToken.getParameterized(ApiResponse.class, PostReactionResp.class).getType());
+                TypeToken.getParameterized(ApiResponse.class, PostReactionResponse.class).getType());
         assertThat(response.getData()).isEqualTo(mockResponse);
     }
 
@@ -160,7 +160,7 @@ public class PostReactionIntegrationTest {
         // given
         Boolean like = null;
         Boolean dislike = true;
-        PostReactionReq mockRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -188,7 +188,7 @@ public class PostReactionIntegrationTest {
         boolean beforeDislike = true;
         boolean afterDislike = false;
         postReactionRepository.save(getReaction(ReactionType.DISLIKE, beforeDislike));
-        PostReactionReq mockRequest = new PostReactionReq(null, afterDislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(null, afterDislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -215,7 +215,7 @@ public class PostReactionIntegrationTest {
         // given
         Boolean like = null;
         Boolean dislike = null;
-        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest invalidRequest = new PostReactionRequest(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -237,7 +237,7 @@ public class PostReactionIntegrationTest {
         // given
         boolean like = true;
         boolean dislike = false;
-        PostReactionReq invalidRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest invalidRequest = new PostReactionRequest(like, dislike);
 
         // When
         ResultActions resultActions = mockMvc.perform(
@@ -260,7 +260,7 @@ public class PostReactionIntegrationTest {
         long invalidPostId = 10L;
         boolean like = true;
         Boolean dislike = null;
-        PostReactionReq mockRequest = new PostReactionReq(like, dislike);
+        PostReactionRequest mockRequest = new PostReactionRequest(like, dislike);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -278,8 +278,8 @@ public class PostReactionIntegrationTest {
 
     private static Reaction getReaction(ReactionType reactionType, boolean active) {
         return reactionType == ReactionType.LIKE
-                ? Reaction.of(USER_ID, POST_ID, new PostReactionReq(active, null))
-                : Reaction.of(USER_ID, POST_ID, new PostReactionReq(null, active));
+                ? Reaction.of(USER_ID, POST_ID, new PostReactionRequest(active, null))
+                : Reaction.of(USER_ID, POST_ID, new PostReactionRequest(null, active));
     }
 
     private CustomUserDetails createUserDetails() {

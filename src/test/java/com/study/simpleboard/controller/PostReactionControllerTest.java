@@ -2,8 +2,8 @@ package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.PostReactionReq;
-import com.study.simpleboard.dto.PostReactionResp;
+import com.study.simpleboard.dto.request.PostReactionRequest;
+import com.study.simpleboard.dto.response.PostReactionResponse;
 import com.study.simpleboard.dto.User;
 import com.study.simpleboard.service.PostReactionService;
 import jakarta.validation.ConstraintViolation;
@@ -57,11 +57,11 @@ class PostReactionControllerTest {
     @Test
     void getReaction() throws Exception {
         // Given: Mock 데이터 정의
-        PostReactionResp mockResponse = getResponse();
+        PostReactionResponse mockResponse = getResponse();
         when(postReactionService.getReactionResponse(POST_ID, USER_DETAILS)).thenReturn(mockResponse);
 
         // When
-        ApiResponse<PostReactionResp> response = postReactionController.getReaction(POST_ID, USER_DETAILS);
+        ApiResponse<PostReactionResponse> response = postReactionController.getReaction(POST_ID, USER_DETAILS);
 
         // Then
         assertThat(response).isNotNull();
@@ -76,7 +76,7 @@ class PostReactionControllerTest {
     @Test
     void saveReaction() throws Exception {
         // Given: Mock 데이터 정의
-        PostReactionReq mockRequest = getRequest();
+        PostReactionRequest mockRequest = getRequest();
 
         // When
         ResponseEntity<Void> response = postReactionController.saveReaction(POST_ID, mockRequest, USER_DETAILS);
@@ -104,12 +104,12 @@ class PostReactionControllerTest {
         assertThat(violations).anyMatch(violation -> violation.getMessage().contains("0보다 커야 합니다"));
     }
 
-    private PostReactionReq getRequest() {
-        return new PostReactionReq(null, true);
+    private PostReactionRequest getRequest() {
+        return new PostReactionRequest(null, true);
     }
 
-    private PostReactionResp getResponse() {
-        return PostReactionResp.createDefault()
+    private PostReactionResponse getResponse() {
+        return PostReactionResponse.createDefault()
                 .changeLike(true);
     }
 }
