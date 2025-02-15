@@ -2,9 +2,11 @@ package com.study.simpleboard;
 
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.request.PostCreateRequest;
 import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.mapper.PostMapper;
+import com.study.simpleboard.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Sql(scripts = "/post_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class PostIntegrationTest {
-    private final static Long USER_ID = 1L;
     private final static Gson gson = new Gson();
 
     @Autowired
@@ -38,9 +41,20 @@ public class PostIntegrationTest {
     @Autowired
     private PostMapper postMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        CustomUserDetails userDetails = createUserDetails();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+    }
+
+    private CustomUserDetails createUserDetails() {
+        return new CustomUserDetails(userMapper.findById(1L).get());
     }
 
     @Test
@@ -61,7 +75,7 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.message").value("게시글이 저장되었습니다."));
+                .andExpect(jsonPath("$.message").value("게시물이 저장되었습니다."));
 
         long postId = 1L;
         Optional<PostDto.PostResponse> postData = postMapper.selectPostById(postId);
@@ -159,9 +173,7 @@ public class PostIntegrationTest {
                 .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
     }
 
-    // TODO: userId 검증 추가
-
     private static PostCreateRequest createRequest(String title, String content) {
-        return new PostCreateRequest(USER_ID, title, content);
+        return new PostCreateRequest(title, content);
     }
 }
