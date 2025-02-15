@@ -20,6 +20,12 @@
     )
   </select>
 
+  <select id="findPostIdByCommentId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    SELECT post_id
+    FROM comments
+    WHERE comment_id = #{commentId}
+  </select>
+
   <select id="selectCommentList" resultType="com.study.simpleboard.dto.CommentResponseDTO" parameterType="long">
     SELECT c.comment_id, c.user_id, c.post_id, c.parent_comment_id, c.comment_content, c.created_at
     FROM comment c

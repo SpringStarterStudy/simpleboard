@@ -12,6 +12,8 @@ public interface CommentMapper {
 
     boolean existsByCommentId(Long commentId);
 
+    Long findPostIdByCommentId(Long commentId);
+
     void insertComment(CommentCreateDTO createDTO);
 
     void insertReply(ReplyCreateDTO replyDTO);

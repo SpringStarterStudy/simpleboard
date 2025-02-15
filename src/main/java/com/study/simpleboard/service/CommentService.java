@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentMapper commentMapper;
-    private final PostMapper postMapper;
 
     @Transactional
     public void createComment(Long postId, Long userId, CommentRequestDTO requestDTO) {
@@ -30,10 +29,8 @@ public class CommentService {
     }
 
     @Transactional
-    public void createReply(Long postId, Long userId, CommentRequestDTO requestDTO, Long parentId) {
-        if (!postMapper.existsById(postId)) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
+    public void createReply(Long userId, CommentRequestDTO requestDTO, Long parentId) {
+        Long postId = commentMapper.findPostIdByCommentId(parentId);
 
         if (!commentMapper.existsByCommentId(parentId)){
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
