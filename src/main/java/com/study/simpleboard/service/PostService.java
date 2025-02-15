@@ -2,8 +2,10 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.study.simpleboard.dto.PostDto;
@@ -68,9 +70,9 @@ public class PostService {
     }
     
     @Transactional
-    public void savePost(PostCreateRequest postCreateRequest) {
-        // userId 검증은 나중에 인증 구현 후 추가 예정
-        postMapper.save(Post.from(postCreateRequest));
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userDetails.userId")
+    public void savePost(PostCreateRequest postCreateRequest, CustomUserDetails userDetails) {
+        postMapper.save(Post.from(postCreateRequest, userDetails.getUserId()));
     }
     
     @Transactional(readOnly = true)

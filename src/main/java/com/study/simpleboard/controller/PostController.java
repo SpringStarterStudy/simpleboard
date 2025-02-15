@@ -1,11 +1,13 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.dto.CustomUserDetails;
 import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.service.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.study.simpleboard.dto.request.PostCreateRequest;
@@ -33,8 +35,9 @@ public class PostController {
   
     // 게시물 작성
     @PostMapping("/posts")
-    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
-        postService.savePost(postCreateRequest);
+    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateRequest postCreateRequest,
+                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.savePost(postCreateRequest, userDetails);
         return ApiResponse.success("게시물이 저장되었습니다.");
     }
   

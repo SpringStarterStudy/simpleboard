@@ -23,9 +23,9 @@ public class Post {
         this(null, userId, title, content, createdAt, updatedAt, deletedAt, viewCount);
     }
 
-    public static Post from(PostCreateRequest postCreateRequest) {
+    public static Post from(PostCreateRequest postCreateRequest, Long userId) {
         return Post.builder()
-                .userId(postCreateRequest.getUserId())
+                .userId(userId)
                 .title(postCreateRequest.getTitle())
                 .content(postCreateRequest.getContent())
                 .createdAt(LocalDateTime.now())
