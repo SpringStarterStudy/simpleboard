@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import com.study.simpleboard.domain.Post;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostCreateRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -68,9 +68,9 @@ public class PostService {
     }
     
     @Transactional
-    public void savePost(PostCreateReq postCreateReq) {
+    public void savePost(PostCreateRequest postCreateRequest) {
         // userId 검증은 나중에 인증 구현 후 추가 예정
-        postMapper.save(Post.from(postCreateReq));
+        postMapper.save(Post.from(postCreateRequest));
     }
     
     @Transactional(readOnly = true)

@@ -2,7 +2,7 @@ package com.study.simpleboard;
 
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostCreateRequest;
 import com.study.simpleboard.dto.PostDto;
 import com.study.simpleboard.mapper.PostMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +49,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostCreateRequest mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -77,7 +77,7 @@ public class PostIntegrationTest {
         // given
         String title = null;
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostCreateRequest mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -99,7 +99,7 @@ public class PostIntegrationTest {
         // given
         String title = "    ";
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostCreateRequest mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -121,7 +121,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = null;
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostCreateRequest mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -143,7 +143,7 @@ public class PostIntegrationTest {
         // given
         String title = "내용 테스트";
         String content = "    ";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostCreateRequest mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -161,7 +161,7 @@ public class PostIntegrationTest {
 
     // TODO: userId 검증 추가
 
-    private static PostCreateReq createRequest(String title, String content) {
-        return new PostCreateReq(USER_ID, title, content);
+    private static PostCreateRequest createRequest(String title, String content) {
+        return new PostCreateRequest(USER_ID, title, content);
     }
 }

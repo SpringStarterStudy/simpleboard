@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostCreateRequest;
 
 @Validated
 @RestController
@@ -33,8 +33,8 @@ public class PostController {
   
     // 게시물 작성
     @PostMapping("/posts")
-    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateReq postCreateReq) {
-        postService.savePost(postCreateReq);
+    public ApiResponse<Void> savePost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
+        postService.savePost(postCreateRequest);
         return ApiResponse.success("게시물이 저장되었습니다.");
     }
   

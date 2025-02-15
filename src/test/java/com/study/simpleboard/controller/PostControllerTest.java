@@ -1,7 +1,7 @@
 package com.study.simpleboard.controller;
 
 import com.google.gson.Gson;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostCreateRequest;
 import com.study.simpleboard.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,7 @@ class PostControllerTest {
     @Test
     void savePost() throws Exception {
         // Given: Mock 데이터 정의
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, CONTENT);
+        PostCreateRequest mockRequest = getRequest(USER_ID, TITLE, CONTENT);
 
         // When
         ResultActions resultActions = performPostRequest(mockRequest);
@@ -56,7 +56,7 @@ class PostControllerTest {
     @DisplayName("게시글 저장 - 제목이 null일 경우")
     @Test
     void savePost_titleIsNull_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, null, CONTENT);
+        PostCreateRequest mockRequest = getRequest(USER_ID, null, CONTENT);
 
         // When
         ResultActions resultActions = performPostRequest(mockRequest);
@@ -69,7 +69,7 @@ class PostControllerTest {
     @DisplayName("게시글 저장 - 제목이 Blank일 경우")
     @Test
     void savePost_titleIsBlank_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, "  ", CONTENT);
+        PostCreateRequest mockRequest = getRequest(USER_ID, "  ", CONTENT);
 
         // When
         ResultActions resultActions = performPostRequest(mockRequest);
@@ -82,7 +82,7 @@ class PostControllerTest {
     @DisplayName("게시글 저장 - 내용이 null일 경우")
     @Test
     void savePost_contentIsNull_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, null);
+        PostCreateRequest mockRequest = getRequest(USER_ID, TITLE, null);
 
         // When
         ResultActions resultActions = performPostRequest(mockRequest);
@@ -95,7 +95,7 @@ class PostControllerTest {
     @DisplayName("게시글 저장 - 내용이 Blank일 경우")
     @Test
     void savePost_contentIsBlank_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, "  ");
+        PostCreateRequest mockRequest = getRequest(USER_ID, TITLE, "  ");
 
         // When
         ResultActions resultActions = performPostRequest(mockRequest);
@@ -107,11 +107,11 @@ class PostControllerTest {
 
     // TODO: userId 검증 추가
 
-    private PostCreateReq getRequest(Long userId, String title, String content) {
-        return new PostCreateReq(userId, title, content);
+    private PostCreateRequest getRequest(Long userId, String title, String content) {
+        return new PostCreateRequest(userId, title, content);
     }
 
-    private ResultActions performPostRequest(PostCreateReq mockRequest) throws Exception {
+    private ResultActions performPostRequest(PostCreateRequest mockRequest) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -2,7 +2,7 @@ package com.study.simpleboard.domain;
 
 import com.study.simpleboard.dto.PostDto;
 import lombok.*;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.dto.request.PostCreateRequest;
 import java.time.LocalDateTime;
 
 @Getter
@@ -23,11 +23,11 @@ public class Post {
         this(null, userId, title, content, createdAt, updatedAt, deletedAt, viewCount);
     }
 
-    public static Post from(PostCreateReq postCreateReq) {
+    public static Post from(PostCreateRequest postCreateRequest) {
         return Post.builder()
-                .userId(postCreateReq.getUserId())
-                .title(postCreateReq.getTitle())
-                .content(postCreateReq.getContent())
+                .userId(postCreateRequest.getUserId())
+                .title(postCreateRequest.getTitle())
+                .content(postCreateRequest.getContent())
                 .createdAt(LocalDateTime.now())
                 .viewCount(0L)
                 .build();
