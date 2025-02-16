@@ -32,7 +32,7 @@ public class CommentController {
         return ApiResponse.success("댓글이 생성되었습니다.");  //TODO response 수정
     }
 
-    @PostMapping("comments/{commentId}")
+    @PostMapping("/comments/{commentId}")
     public ApiResponse<Void> createComment(@PathVariable Long commentId,
                                            @Valid @RequestBody CommentRequestDTO requestDTO,
                                            @AuthenticationPrincipal CustomUserDetails userDetails) {

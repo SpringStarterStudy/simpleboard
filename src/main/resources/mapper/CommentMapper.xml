@@ -22,7 +22,7 @@
 
   <select id="findPostIdByCommentId" parameterType="java.lang.Long" resultType="java.lang.Long">
     SELECT post_id
-    FROM comments
+    FROM comment
     WHERE comment_id = #{commentId}
   </select>
 
