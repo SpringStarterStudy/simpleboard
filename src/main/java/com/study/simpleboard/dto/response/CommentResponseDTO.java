@@ -1,4 +1,4 @@
-package com.study.simpleboard.dto;
+package com.study.simpleboard.dto.response;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
