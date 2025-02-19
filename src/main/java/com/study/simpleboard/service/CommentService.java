@@ -9,7 +9,6 @@ import com.study.simpleboard.dto.ReplyCreateDTO;
 import com.study.simpleboard.mapper.CommentMapper;
 import java.util.List;
 
-import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class CommentService {
     public void createReply(Long userId, CommentRequestDTO requestDTO, Long parentId) {
         Long postId = commentMapper.findPostIdByCommentId(parentId);
 
-        if (!commentMapper.existsByCommentId(parentId)){
+        if (postId == null){
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
 
