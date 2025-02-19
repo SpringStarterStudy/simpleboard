@@ -33,22 +33,30 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll() // 누구나 접근 가능
-                        .requestMatchers(HttpMethod.GET, "/api/posts/**", "/api/comments/**").permitAll()  // GET 요청은 모두 허용
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        //.requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/login/kakao", "/kauth.kakao.com/**").permitAll() // 누구나 접근 가능
+                        //.requestMatchers(HttpMethod.GET, "/api/posts/**", "/api/comments/**").permitAll()  // GET 요청은 모두 허용
+                        //.requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        //.requestMatchers(HttpMethod.POST, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        //.requestMatchers(HttpMethod.PUT, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        //.requestMatchers(HttpMethod.DELETE, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/**").permitAll()  // 일단 테스트를 위해 모든 경로 허용
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증된 사용자만 접근 가능
                 )
-                .formLogin(login -> login
+                .formLogin(formLogin -> formLogin.disable())  // 폼 로그인 비활성화
+                .httpBasic(httpBasic -> httpBasic.disable())  // HTTP Basic 인증도 비활성화
+                /*.formLogin(login -> login
                         .loginProcessingUrl("/api/users/login")    // 로그인 처리 URL
                         .usernameParameter("email")                // 로그인 시 사용할 이메일 파라미터 이름
                         .passwordParameter("password")             // 로그인 시 사용할 비밀번호 파라미터 이름
                         .successHandler(authSuccessHandler)        // 로그인 성공 시 처리를 위한 핸들러
                         .failureHandler(authFailureHandler)        // 로그인 실패 시 처리를 위한 핸들러
                         .permitAll()
-                )
+                )*/
+                /*.oauth2Login(oauth2 -> oauth2           // OAuth2 로그인 설정 추가
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .permitAll()
+                )*/
                 .logout(logout -> logout
                         .logoutUrl("/api/users/logout")                  // 로그아웃 처리 URL
                         .logoutSuccessHandler(logoutSuccessHandler)      // 로그아웃이 되면

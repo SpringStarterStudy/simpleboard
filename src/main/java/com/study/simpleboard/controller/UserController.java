@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.util.Collections;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -83,27 +84,29 @@ public class UserController {
             @Valid @RequestBody DeleteUserRequest deleteUserRequest,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         userService.deleteUser(userDetails.getUserId(), deleteUserRequest.getPassword());
-        new SecurityContextLogoutHandler().logout(httpRequest, null, null);
+        // new SecurityContextLogoutHandler().logout(httpRequest, null, null);
+        SecurityContextHolder.clearContext(); // SecurityContextHolder를 직접 사용
         return ApiResponse.success(null);
     }
 
-    // 카카오 로그인
-    @GetMapping("/login/kakao")
-    public ApiResponse<UserResponse> kakaoLogin(@RequestParam String code) {
-        UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
-        return ApiResponse.success(userResponse);
-    }
-
-    // 카카오 인증 코드 요청 페이지
+    // 카카오 인증 페이지로 리다이렉트
     @GetMapping("/oauth/kakao")
     public void redirectToKakaoAuthorization(HttpServletResponse response) throws IOException {
         String kakaoAuthorizationUrl = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
-                .queryParam("scope", "profile_nickname,account_email") // 필요한 권한 설정
+                .queryParam("scope", "profile_nickname,account_email")
                 .build().toUriString();
 
         response.sendRedirect(kakaoAuthorizationUrl);
+    }
+
+    // 카카오 로그인 콜백 처리 (redirect_uri와 일치하는 경로로 변경)
+    @GetMapping("/oauth/kakao/callback")  // 카카오 개발자 콘솔의 redirect_uri와 일치
+    public ApiResponse<UserResponse> kakaoLogin(@RequestParam String code) {
+        log.info("Received code in controller: {}", code);
+        UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
+        return ApiResponse.success(userResponse);
     }
 }

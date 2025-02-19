@@ -1,5 +1,7 @@
 package com.study.simpleboard.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.*;
@@ -7,6 +9,7 @@ import com.study.simpleboard.dto.response.UserResponse;
 import com.study.simpleboard.mapper.UserMapper;
 import com.study.simpleboard.mapper.UserSocialMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoUserService {
@@ -45,18 +49,23 @@ public class KakaoUserService {
     @Value("${kakao.client.secret}")
     private String clientSecret;
 
-    @Value("${kakao.redirect.uri}")
+    @Value("${kakao.client.redirect-uri}")
     private String redirectUri;
 
     // 카카오 로그인
     @Transactional
     public UserResponse loginKakaoUser(String code) {
+        log.info("=== Login Kakao User Started ===");
+        log.info("Received code in service: {}", code);
+
         // 인가 코드로 액세스토큰 요청
         KakaoToken kakaoToken = getKakaoToken(code);
+        log.info("Token received: {}", kakaoToken != null);
 
         // 액세스 토큰으로 카카오 사용자 정보 요청
         KakaoUser kakaoUser = getKakaoUser(kakaoToken.getAccessToken());
         String providerId = String.valueOf(kakaoUser.getId());
+        log.info("Kakao user info received. Provider ID: {}", providerId);
 
         // 카카오 ID로 가입된 기존 회원인지 확인
         // 회원 찾기 또는 생성
@@ -70,10 +79,14 @@ public class KakaoUserService {
 
     // 카카오 액세스 토큰 요청
     private KakaoToken getKakaoToken(String code) {
+        log.info("Requesting Kakao token with code: {}", code); // 로깅
+
         String reqURL = TOKEN_REQUEST_URL;
+        log.info("Token URL: {}", reqURL); // 로깅
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        log.info("Headers: {}", headers); // 로깅
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add(GRANT_TYPE_PARAM, GRANT_TYPE_VALUE);
@@ -81,16 +94,19 @@ public class KakaoUserService {
         params.add(CLIENT_SECRET_PARAM, clientSecret);
         params.add(REDIRECT_URI_PARAM, redirectUri);
         params.add(CODE_PARAM, code);
+        log.info("Token request params: {}", params);  // 파라미터 로깅
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
         // RestTemplate을 사용하여 카카오 토큰 API 호출
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<KakaoToken> response = restTemplate.postForEntity(
+        ResponseEntity<KakaoToken> response = restTemplate.exchange(
                 reqURL,
+                HttpMethod.POST,
                 request,
                 KakaoToken.class
         );
+        log.info("Response status: {}", response.getStatusCode()); // 로깅
+        log.info("Response body: {}", response.getBody()); // 로깅
 
         return response.getBody();
     }

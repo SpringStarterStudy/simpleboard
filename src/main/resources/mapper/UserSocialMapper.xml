@@ -3,7 +3,7 @@
 
 <mapper namespace="com.study.simpleboard.mapper.UserSocialMapper">
 
-    <insert id="insertUserSocial" parameterType="UserSocial" useGeneratedKeys="true" keyProperty="userSocialId">
+    <insert id="insertUserSocial" parameterType="com.study.simpleboard.dto.UserSocial" useGeneratedKeys="true" keyProperty="userSocialId">
         INSERT INTO user_social (
             user_id,
             provider,
@@ -19,14 +19,14 @@
         )
     </insert>
 
-    <select id="findByProviderAndProviderId" resultType="UserSocial">
+    <select id="findByProviderAndProviderId" resultType="com.study.simpleboard.dto.UserSocial">
         SELECT *
         FROM user_social
         WHERE provider = #{provider}
         AND provider_id = #{providerId}
     </select>
 
-    <update id="updateToken" parameterType="UserSocial">
+    <update id="updateToken" parameterType="com.study.simpleboard.dto.UserSocial">
         UPDATE user_social
         SET
         refresh_token = #{refreshToken},
