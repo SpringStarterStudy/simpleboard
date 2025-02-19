@@ -33,6 +33,14 @@ public class CommentController {
         return ApiResponse.success("댓글이 생성되었습니다.");
     }
 
+    @PostMapping("/comments/{commentId}")
+    public ApiResponse<Void> createComment(@PathVariable Long commentId,
+                                           @Valid @RequestBody CommentRequestDTO requestDTO,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.createReply(userDetails.getUserId(), requestDTO, commentId);
+        return ApiResponse.success(String.format("댓글 %d의 대댓글이 생성되었습니다.", commentId));
+    }
+
     @GetMapping("/posts/{postId}/comments")
     public ApiResponse<List<CommentResponseDTO>> getCommentList(@PathVariable Long postId) {
         return ApiResponse.success("댓글이 조회되었습니다.", commentService.getCommentList(postId));
