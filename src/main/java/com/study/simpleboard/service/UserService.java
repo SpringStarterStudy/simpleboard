@@ -43,7 +43,7 @@ public class UserService {
     }
 
     // 단일 정보 조회
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') and (authentication.principal.userId == #userId or hasRole('ADMIN'))")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and authentication.principal.userId == #userId)")
     public UserResponse findById(Long userId) {
         User user = userMapper.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
