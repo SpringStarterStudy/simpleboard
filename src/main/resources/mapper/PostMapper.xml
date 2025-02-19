@@ -19,7 +19,6 @@
             AND user_id = #{searchUser}
         </if>
         ORDER BY post_id DESC
-        <!-- 페이지네이션 적용 (MySQL 문법) -->
         LIMIT #{pageSize}
         OFFSET #{offset}
     </select>
@@ -58,7 +57,7 @@
 
     <update id="updateViewCount">
         UPDATE post
-        SET view_count = view_count + 1, updated_at = updated_at
+        SET view_count = view_count + 1
         WHERE post_id = #{post_id}
         AND deleted_at IS NULL
     </update>
@@ -71,13 +70,13 @@
 
     <update id="updatePostById">
         UPDATE post
-        SET post_title = #{post.title}, post_content = #{post.content}
+        SET post_title = #{post.title}, post_content = #{post.content}, updated_at = NOW()
         WHERE post_id = #{postId}
     </update>
 
     <update id="deletePostById">
         UPDATE post
-        SET updated_at = updated_at, deleted_at = NOW()
+        SET deleted_at = NOW()
         WHERE post_id = #{postId}
     </update>
 
