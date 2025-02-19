@@ -46,15 +46,7 @@ public class PostService {
 
         Page<PostResponseDTO.PostList> postPage = new PageImpl<>(postList, pageable, totalPostCount);
 
-        return PostResponseDTO.PostsAndPageResponse.of(
-                postPage.getContent(),
-                postPage.getNumber() + 1,
-                postPage.getNumberOfElements(),
-                postPage.getSize(),
-                postPage.getTotalElements(),
-                postPage.getTotalPages(),
-                PAGE_GROUP_SIZE
-        );
+        return PostResponseDTO.PostsAndPageResponse.of(postPage, PAGE_GROUP_SIZE);
     }
 
     @Transactional

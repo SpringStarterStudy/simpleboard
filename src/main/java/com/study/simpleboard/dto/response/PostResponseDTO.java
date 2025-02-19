@@ -33,19 +33,16 @@ public class PostResponseDTO {
         private Integer totalPages;     // 전체 페이지의 수
         private Integer pageGroupSize;  // 페이지 그룹의 크기 (default:5)
 
-        public static <T> PostsAndPageResponse<T> of(
-                List<PostList> postList, int currentPage, int currentSize, int postPerPage,
-                long totalPostsCount, int totalPages, int pageGroupSize
-        ) {
-            return PostsAndPageResponse.<T>builder()
-                    .postList(postList)
-                    .currentPage(currentPage)
-                    .currentSize(currentSize)
-                    .postPerPage(postPerPage)
-                    .totalPostsCount(totalPostsCount)
-                    .totalPages(totalPages)
-                    .pageGroupSize(pageGroupSize)
-                    .build();
+        public static PostsAndPageResponse<PostList> of(Page<PostList> postPage, int pageGroupSize) {
+            return new PostsAndPageResponse<>(
+                    postPage.getContent(),
+                    postPage.getNumber() + 1,
+                    postPage.getNumberOfElements(),
+                    postPage.getSize(),
+                    postPage.getTotalElements(),
+                    postPage.getTotalPages(),
+                    pageGroupSize
+            );
         }
 
         public static <T> PostsAndPageResponse<T> empty(Pageable pageable, int pageGroupSize) {
