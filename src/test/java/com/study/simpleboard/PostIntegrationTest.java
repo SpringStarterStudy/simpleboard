@@ -2,9 +2,11 @@ package com.study.simpleboard;
 
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
-import com.study.simpleboard.dto.PostCreateReq;
-import com.study.simpleboard.dto.PostDto;
+import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.request.PostRequestDTO;
+import com.study.simpleboard.dto.response.PostResponseDTO;
 import com.study.simpleboard.mapper.PostMapper;
+import com.study.simpleboard.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Sql(scripts = "/post_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class PostIntegrationTest {
-    private final static Long USER_ID = 1L;
     private final static Gson gson = new Gson();
 
     @Autowired
@@ -38,9 +41,20 @@ public class PostIntegrationTest {
     @Autowired
     private PostMapper postMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        CustomUserDetails userDetails = createUserDetails();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+    }
+
+    private CustomUserDetails createUserDetails() {
+        return new CustomUserDetails(userMapper.findById(1L).get());
     }
 
     @Test
@@ -49,7 +63,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -61,12 +75,12 @@ public class PostIntegrationTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.message").value("게시글이 저장되었습니다."));
+                .andExpect(jsonPath("$.message").value("게시물이 저장되었습니다."));
 
         long postId = 1L;
-        Optional<PostDto.PostResponse> postData = postMapper.selectPostById(postId);
+        Optional<PostResponseDTO.PostDetail> postData = postMapper.selectPostById(postId);
         assertThat(postData).isPresent();
-        PostDto.PostResponse post = postData.get();
+        PostResponseDTO.PostDetail post = postData.get();
         assertThat(post.getTitle()).isEqualTo(title);
         assertThat(post.getContent()).isEqualTo(content);
     }
@@ -77,7 +91,7 @@ public class PostIntegrationTest {
         // given
         String title = null;
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -99,7 +113,7 @@ public class PostIntegrationTest {
         // given
         String title = "    ";
         String content = "내용 테스트";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -121,7 +135,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = null;
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -143,7 +157,7 @@ public class PostIntegrationTest {
         // given
         String title = "내용 테스트";
         String content = "    ";
-        PostCreateReq mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -159,9 +173,7 @@ public class PostIntegrationTest {
                 .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
     }
 
-    // TODO: userId 검증 추가
-
-    private static PostCreateReq createRequest(String title, String content) {
-        return new PostCreateReq(USER_ID, title, content);
+    private static PostRequestDTO.CreateAndUpdate createRequest(String title, String content) {
+        return new PostRequestDTO.CreateAndUpdate(title, content);
     }
 }

@@ -2,18 +2,19 @@ package com.study.simpleboard.service;
 
 import com.study.simpleboard.common.exception.CustomException;
 import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.dto.request.PostRequestDTO;
+import com.study.simpleboard.dto.response.PostResponseDTO;
+import com.study.simpleboard.domain.Post;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.study.simpleboard.dto.PostDto;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
-import com.study.simpleboard.domain.Post;
-import com.study.simpleboard.dto.PostCreateReq;
 
 @Service
 @RequiredArgsConstructor
@@ -22,17 +23,15 @@ public class PostService {
     private final PostMapper postMapper;
     private static final int PAGE_GROUP_SIZE = 5;
 
-
-    // 전체 게시물 목록 조회
     @Transactional(readOnly = true)
-    public PostDto.PostsAndPageResponse<PostDto.ListInfo> findAllPosts(
+    public PostResponseDTO.PostsAndPageResponse<PostResponseDTO.PostList> findAllPosts(
             Pageable pageable, String searchKeyword, String searchUser
     ) {
 
         long totalPostCount = postMapper.countPosts(searchKeyword, searchUser);
 
         if(totalPostCount == 0) {
-            return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+            return PostResponseDTO.PostsAndPageResponse.<PostResponseDTO.PostList>builder()
                     .postList(List.of())
                     .currentPage(pageable.getPageNumber() + 1)
                     .currentSize(0)
@@ -51,12 +50,12 @@ public class PostService {
         int offset = (int) pageable.getOffset();
         int pageSize = pageable.getPageSize();
 
-        List<PostDto.ListInfo> postList =
+        List<PostResponseDTO.PostList> postList =
                 postMapper.selectAllPosts(offset, pageSize, searchKeyword, searchUser);
 
-        Page<PostDto.ListInfo> postPage = new PageImpl<>(postList, pageable, totalPostCount);
+        Page<PostResponseDTO.PostList> postPage = new PageImpl<>(postList, pageable, totalPostCount);
 
-        return PostDto.PostsAndPageResponse.<PostDto.ListInfo>builder()
+        return PostResponseDTO.PostsAndPageResponse.<PostResponseDTO.PostList>builder()
                 .postList(postPage.getContent())
                 .currentPage(postPage.getNumber() + 1)
                 .currentSize(postPage.getNumberOfElements())
@@ -66,63 +65,44 @@ public class PostService {
                 .pageGroupSize(PAGE_GROUP_SIZE)
                 .build();
     }
-    
+
     @Transactional
-    public void savePost(PostCreateReq postCreateReq) {
-        // userId 검증은 나중에 인증 구현 후 추가 예정
-        postMapper.save(Post.from(postCreateReq));
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
+    public void savePost(PostRequestDTO.CreateAndUpdate request, Long userId) {
+        postMapper.save(Post.from(request, userId));
     }
-    
+
     @Transactional(readOnly = true)
-    public PostDto.PostResponse findPostById(Long postId) {
-
-        PostDto.PostResponse post = postMapper.selectPostById(postId).
-                orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-
-        return PostDto.PostResponse.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .viewCount(post.getViewCount())
-                .build();
+    public PostResponseDTO.PostDetail findPostById(Long postId) {
+        PostResponseDTO.PostDetail post =
+                postMapper.selectPostById(postId).orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+        return post;
     }
 
-    @Async
     @Transactional
+    @Async
     public void incrementViewCountAsync(Long postId) {
         postMapper.updateViewCount(postId);
     }
-    
+
     @Transactional
-    public void updatePost(Long postId, PostDto.UpdateRequest request) {
-        boolean exists = postMapper.existsById(postId);
-        if(!exists) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
-    
-        boolean isAuthor = postMapper.existsByPostIdAndUserId(postId, request.getUserId());
-        if(!isAuthor) {
-            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
-        }
-        postMapper.updatePostById(postId, Post.fromUpdateRequest(request));
+    public void updatePost(Long postId, Long userId, PostRequestDTO.CreateAndUpdate request) {
+        validatePostOwnerShip(postId, userId);
+        postMapper.updatePostById(postId, Post.from(request, userId));
     }
-  
+
     @Transactional
     public void deletePost(Long postId, Long userId) {
-        boolean exists = postMapper.existsById(postId);
-        if(!exists) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
-
-        boolean isAuthor = postMapper.existsByPostIdAndUserId(postId, userId);
-        if(!isAuthor) {
-            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
-        }
-
-        postMapper.deletePostById(postId, userId);
+        validatePostOwnerShip(postId, userId);
+        postMapper.deletePostById(postId);
     }
 
+    private void validatePostOwnerShip(Long postId, Long userId) {
+        Long authorId = postMapper.findPostAuthor(postId)
+                .orElseThrow(()-> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        if(!authorId.equals(userId)) {
+            throw new CustomException(ErrorCode.NO_POST_AUTHORITY);
+        }
+    }
 }
