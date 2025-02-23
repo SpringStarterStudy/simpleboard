@@ -3,8 +3,8 @@ package com.study.simpleboard;
 import com.google.gson.Gson;
 import com.study.simpleboard.common.exception.ErrorCode;
 import com.study.simpleboard.dto.CustomUserDetails;
-import com.study.simpleboard.dto.request.PostCreateRequest;
-import com.study.simpleboard.dto.PostDto;
+import com.study.simpleboard.dto.request.PostRequestDTO;
+import com.study.simpleboard.dto.response.PostResponseDTO;
 import com.study.simpleboard.mapper.PostMapper;
 import com.study.simpleboard.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +63,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = "내용 테스트";
-        PostCreateRequest mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -78,9 +78,9 @@ public class PostIntegrationTest {
                 .andExpect(jsonPath("$.message").value("게시물이 저장되었습니다."));
 
         long postId = 1L;
-        Optional<PostDto.PostResponse> postData = postMapper.selectPostById(postId);
+        Optional<PostResponseDTO.PostDetail> postData = postMapper.selectPostById(postId);
         assertThat(postData).isPresent();
-        PostDto.PostResponse post = postData.get();
+        PostResponseDTO.PostDetail post = postData.get();
         assertThat(post.getTitle()).isEqualTo(title);
         assertThat(post.getContent()).isEqualTo(content);
     }
@@ -91,7 +91,7 @@ public class PostIntegrationTest {
         // given
         String title = null;
         String content = "내용 테스트";
-        PostCreateRequest mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -113,7 +113,7 @@ public class PostIntegrationTest {
         // given
         String title = "    ";
         String content = "내용 테스트";
-        PostCreateRequest mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -135,7 +135,7 @@ public class PostIntegrationTest {
         // given
         String title = "제목 테스트";
         String content = null;
-        PostCreateRequest mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -157,7 +157,7 @@ public class PostIntegrationTest {
         // given
         String title = "내용 테스트";
         String content = "    ";
-        PostCreateRequest mockRequest = createRequest(title, content);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -173,7 +173,7 @@ public class PostIntegrationTest {
                 .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
     }
 
-    private static PostCreateRequest createRequest(String title, String content) {
-        return new PostCreateRequest(title, content);
+    private static PostRequestDTO.CreateAndUpdate createRequest(String title, String content) {
+        return new PostRequestDTO.CreateAndUpdate(title, content);
     }
 }

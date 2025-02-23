@@ -35,8 +35,8 @@ public class PostController {
 
     @PostMapping("/posts")
     public ApiResponse<Void> savePost(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid PostRequestDTO.CreateAndUpdate request
+            @RequestBody @Valid PostRequestDTO.CreateAndUpdate request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         postService.savePost(request, userDetails.getUserId());
         return ApiResponse.success("게시물이 저장되었습니다.");
