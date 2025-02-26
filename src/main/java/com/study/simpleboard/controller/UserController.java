@@ -109,4 +109,18 @@ public class UserController {
         UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
         return ApiResponse.success(userResponse);
     }
+
+    // 카카오 로그아웃
+    @PostMapping("/oauth/kakao/logout")
+    public ApiResponse<Void> kakaoLogout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        kakaoUserService.kakaoLogout(userDetails);
+        return ApiResponse.success(null);
+    }
+
+    // 카카오 유저 회원탈퇴
+    @DeleteMapping("/oauth/kakao")
+    public ApiResponse<Void> withdrawKakaoUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        kakaoUserService.deleteKakaoUser(userDetails.getUserId());
+        return ApiResponse.success(null);
+    }
 }

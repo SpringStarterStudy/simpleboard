@@ -33,4 +33,23 @@
         token_expiry_date = #{tokenExpiryDate}
         WHERE user_social_id = #{userSocialId}
     </update>
+
+    <select id="findByUserId" resultType="com.study.simpleboard.dto.UserSocial">
+        SELECT *
+        FROM user_social
+        WHERE user_id = #{userId}
+    </select>
+
+    <update id="deleteToken">
+        UPDATE user_social
+        SET
+        refresh_token = NULL,
+        token_expiry_date = NULL
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserSocial">
+        DELETE FROM user_social
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -131,6 +132,47 @@ public class KakaoUserService {
 
         return response.getBody();
     }
+
+    // 카카오 유저 로그아웃
+    @Transactional
+    public void kakaoLogout(CustomUserDetails userDetails) {
+        try {
+            // 사용자의 소셜 정보 조회
+            UserSocial userSocial = userSocialMapper.findByUserId(userDetails.getUserId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            log.info("User social info found: {}", userSocial);
+
+            // 사용자 토큰 정보 삭제 또는 무효화
+            userSocialMapper.deleteToken(userDetails.getUserId());
+
+            SecurityContextHolder.clearContext();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.LOGOUT_FAILED);
+        }
+    }
+
+    // 카카오 로그인 유저 탈퇴
+    @Transactional
+    public void deleteKakaoUser(Long userId) {
+        log.info("deleteKakaoUser method started for userId: {}", userId);
+
+        User user = userMapper.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        log.info("user found: {}", user);
+
+        // 카카오 연동 해제 API 호출 (선택)
+
+        // 소셜 정보 먼저 삭제
+        userSocialMapper.deleteUserSocial(userId);
+
+        // 사용자 삭제
+        userMapper.deleteUser(userId);
+
+        // 삭제 확인
+        User deletedUser = userMapper.findById(userId).orElse(null);
+        log.info("After deletion check: {}", deletedUser);  // null이어야 정상
+    }
+
 
     // 메서드
     // 회원 찾기/생성

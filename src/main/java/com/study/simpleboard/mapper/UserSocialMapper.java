@@ -15,4 +15,13 @@ public interface UserSocialMapper {
 
     // 토큰 업데이트
     void updateToken(UserSocial userSocial);
+
+    // 사용자 ID로 소셜 정보 조회
+    Optional<UserSocial> findByUserId(Long userId);
+
+    // 사용자의 소셜 토큰 정보 삭제
+    void deleteToken(Long userId);
+
+    // 소셜 정보 삭제
+    void deleteUserSocial(Long userId);
 }
