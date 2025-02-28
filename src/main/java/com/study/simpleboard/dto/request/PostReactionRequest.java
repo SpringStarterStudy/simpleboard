@@ -1,7 +1,7 @@
-package com.study.simpleboard.dto;
+package com.study.simpleboard.dto.request;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.service.exception.InvalidReactionException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class PostReactionReq {
-    // userId 검증 임시 추가
-    @NotNull
-    @Positive
-    private final Long userId;
+public class PostReactionRequest {
     private final Boolean like;
     private final Boolean dislike;
 
@@ -25,7 +21,13 @@ public class PostReactionReq {
         return dislike != null;
     }
 
-    public boolean isInvalid() {
+    public void validate() {
+        if (isInvalid()) {
+            throw new InvalidReactionException(ErrorCode.INVALID_REACTION);
+        }
+    }
+
+    private boolean isInvalid() {
         return !hasLike() && !hasDislike() || hasLike() && hasDislike();
     }
 

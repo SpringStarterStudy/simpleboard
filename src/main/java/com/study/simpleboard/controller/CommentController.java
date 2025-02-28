@@ -1,12 +1,14 @@
 package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
-import com.study.simpleboard.dto.CommentRequestDTO;
-import com.study.simpleboard.dto.CommentResponseDTO;
+import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.request.CommentRequestDTO;
+import com.study.simpleboard.dto.response.CommentResponseDTO;
 import com.study.simpleboard.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +27,18 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     public ApiResponse<Void> createComment(@PathVariable Long postId,
-        @Valid @RequestBody CommentRequestDTO requestDTO) { //TODO 인증객체에서 user 받기
-        commentService.createComment(postId, 1L, requestDTO);
-        return ApiResponse.success("댓글이 생성되었습니다.");  //TODO response 수정
+        @Valid @RequestBody CommentRequestDTO requestDTO,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.createComment(postId, userDetails.getUserId(), requestDTO);
+        return ApiResponse.success("댓글이 생성되었습니다.");
+    }
+
+    @PostMapping("/comments/{commentId}")
+    public ApiResponse<Void> createComment(@PathVariable Long commentId,
+                                           @Valid @RequestBody CommentRequestDTO requestDTO,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.createReply(userDetails.getUserId(), requestDTO, commentId);
+        return ApiResponse.success(String.format("댓글 %d의 대댓글이 생성되었습니다.", commentId));
     }
 
     @GetMapping("/posts/{postId}/comments")
@@ -36,16 +47,18 @@ public class CommentController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ApiResponse<Void> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteComment(1L, commentId);
+    public ApiResponse<Void> deleteComment(@PathVariable Long commentId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.deleteComment(userDetails.getUserId(), commentId);
         return ApiResponse.success("댓글이 삭제되었습니다.");
     }
 
     @PutMapping("/comments/{commentId}")
     public ApiResponse<Void> updateComment(@PathVariable Long commentId,
-        @Valid @RequestBody CommentRequestDTO requestDTO) {
-        commentService.updateComment(2L, commentId, requestDTO);
-        return ApiResponse.success("댓글이 수정되었습니다.");  //TODO response 수정
+        @Valid @RequestBody CommentRequestDTO requestDTO,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.updateComment(userDetails.getUserId(), commentId, requestDTO);
+        return ApiResponse.success("댓글이 수정되었습니다.");
     }
 
 

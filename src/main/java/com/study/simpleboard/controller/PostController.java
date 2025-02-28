@@ -13,10 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Validated
 public class PostController {
 
     private final PostService postService;
@@ -35,10 +35,9 @@ public class PostController {
 
     @PostMapping("/posts")
     public ApiResponse<Void> savePost(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid PostRequestDTO.CreateAndUpdate request
+            @RequestBody @Valid PostRequestDTO.CreateAndUpdate request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-
         postService.savePost(request, userDetails.getUserId());
         return ApiResponse.success("게시물이 저장되었습니다.");
     }

@@ -1,8 +1,13 @@
 package com.study.simpleboard.controller;
 
-import com.google.gson.Gson;
-import com.study.simpleboard.dto.PostCreateReq;
+import com.study.simpleboard.common.response.ApiResponse;
+import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.User;
+import com.study.simpleboard.dto.request.PostRequestDTO;
 import com.study.simpleboard.service.PostService;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,112 +15,133 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.lang.reflect.Method;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class PostControllerTest {
-    private final static Long USER_ID = 1L;
+    private final static long USER_ID = 1L;
     private final static String TITLE = "title";
     private final static String CONTENT = "content";
-    private final static Gson gson = new Gson();
+    private final static CustomUserDetails USER_DETAILS = createUserDetails();
 
     @Mock
     private PostService postService;
 
     @InjectMocks
     private PostController postController;
-    private MockMvc mockMvc;
+    private Validator validator;
 
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(postController).build();
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
+    private static CustomUserDetails createUserDetails() {
+        User user = User.createLocalUser("hong@naver.com",
+                "$2a$10$eXthWEeajRbGgRfvlfVBl.LlD6jDWoyAgyRSDa.FdRUTM4vfnYh86",
+                "홍길동", "01012345678");
+        ReflectionTestUtils.setField(user, "userId", USER_ID);
+        return new CustomUserDetails(user);
     }
 
     @DisplayName("게시글 저장")
     @Test
-    void savePost() throws Exception {
+    void savePost() {
         // Given: Mock 데이터 정의
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, CONTENT);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(TITLE, CONTENT);
 
         // When
-        ResultActions resultActions = performPostRequest(mockRequest);
+        ApiResponse<Void> response = postController.savePost(mockRequest, USER_DETAILS);
 
         // Then
-        resultActions.andExpect(status().isOk());
-        verify(postService).savePost(mockRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getMessage()).isEqualTo("게시물이 저장되었습니다.");
+        assertThat(response.getData()).isNull();
+        verify(postService).savePost(mockRequest, USER_ID);
     }
 
     @DisplayName("게시글 저장 - 제목이 null일 경우")
     @Test
     void savePost_titleIsNull_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, null, CONTENT);
+        // given
+        String invalidTitle = null;
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(invalidTitle, CONTENT);
 
         // When
-        ResultActions resultActions = performPostRequest(mockRequest);
+        Method savePost = PostController.class.getMethod("savePost", PostRequestDTO.CreateAndUpdate.class, CustomUserDetails.class);
+        Object[] parameterValues = { mockRequest, USER_DETAILS };
+        Set<ConstraintViolation<PostController>> violations = validator.forExecutables()
+                .validateParameters(new PostController(postService), savePost, parameterValues);
 
         // Then
-        resultActions.andExpect(status().isBadRequest());
-        verify(postService, times(0)).savePost(mockRequest);
+        assertThat(violations).isNotEmpty();    // 예외 발생
+        assertThat(violations).anyMatch(violation -> violation.getMessage().contains("제목을 입력해주세요."));
+        verify(postService, times(0)).savePost(any(PostRequestDTO.CreateAndUpdate.class), anyLong());
     }
 
     @DisplayName("게시글 저장 - 제목이 Blank일 경우")
     @Test
     void savePost_titleIsBlank_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, "  ", CONTENT);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest("  ", CONTENT);
 
         // When
-        ResultActions resultActions = performPostRequest(mockRequest);
+        Method savePost = PostController.class.getMethod("savePost", PostRequestDTO.CreateAndUpdate.class, CustomUserDetails.class);
+        Object[] parameterValues = { mockRequest, USER_DETAILS };
+        Set<ConstraintViolation<PostController>> violations = validator.forExecutables()
+                .validateParameters(new PostController(postService), savePost, parameterValues);
 
         // Then
-        resultActions.andExpect(status().isBadRequest());
-        verify(postService, times(0)).savePost(mockRequest);
+        assertThat(violations).isNotEmpty();    // 예외 발생
+        assertThat(violations).anyMatch(violation -> violation.getMessage().contains("제목을 입력해주세요."));
+        verify(postService, times(0)).savePost(any(PostRequestDTO.CreateAndUpdate.class), anyLong());
     }
 
     @DisplayName("게시글 저장 - 내용이 null일 경우")
     @Test
     void savePost_contentIsNull_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, null);
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(TITLE, null);
 
         // When
-        ResultActions resultActions = performPostRequest(mockRequest);
+        Method savePost = PostController.class.getMethod("savePost", PostRequestDTO.CreateAndUpdate.class, CustomUserDetails.class);
+        Object[] parameterValues = { mockRequest, USER_DETAILS };
+        Set<ConstraintViolation<PostController>> violations = validator.forExecutables()
+                .validateParameters(new PostController(postService), savePost, parameterValues);
 
         // Then
-        resultActions.andExpect(status().isBadRequest());
-        verify(postService, times(0)).savePost(mockRequest);
+        assertThat(violations).isNotEmpty();    // 예외 발생
+        assertThat(violations).anyMatch(violation -> violation.getMessage().contains("내용을 입력해주세요."));
+        verify(postService, times(0)).savePost(any(PostRequestDTO.CreateAndUpdate.class), anyLong());
     }
 
     @DisplayName("게시글 저장 - 내용이 Blank일 경우")
     @Test
     void savePost_contentIsBlank_throwException() throws Exception {
-        PostCreateReq mockRequest = getRequest(USER_ID, TITLE, "  ");
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(TITLE, "  ");
 
         // When
-        ResultActions resultActions = performPostRequest(mockRequest);
+        Method savePost = PostController.class.getMethod("savePost", PostRequestDTO.CreateAndUpdate.class, CustomUserDetails.class);
+        Object[] parameterValues = { mockRequest, USER_DETAILS };
+        Set<ConstraintViolation<PostController>> violations = validator.forExecutables()
+                .validateParameters(new PostController(postService), savePost, parameterValues);
 
         // Then
-        resultActions.andExpect(status().isBadRequest());
-        verify(postService, times(0)).savePost(mockRequest);
+        assertThat(violations).isNotEmpty();    // 예외 발생
+        assertThat(violations).anyMatch(violation -> violation.getMessage().contains("내용을 입력해주세요."));
+        verify(postService, times(0)).savePost(any(PostRequestDTO.CreateAndUpdate.class), anyLong());
     }
 
-    // TODO: userId 검증 추가
-
-    private PostCreateReq getRequest(Long userId, String title, String content) {
-        return new PostCreateReq(userId, title, content);
-    }
-
-    private ResultActions performPostRequest(PostCreateReq mockRequest) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/posts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(mockRequest))
-        );
+    private static PostRequestDTO.CreateAndUpdate createRequest(String title, String content) {
+        return new PostRequestDTO.CreateAndUpdate(title, content);
     }
 }

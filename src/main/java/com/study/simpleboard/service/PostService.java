@@ -7,13 +7,13 @@ import com.study.simpleboard.dto.response.PostResponseDTO;
 import com.study.simpleboard.domain.Post;
 import com.study.simpleboard.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -50,6 +50,7 @@ public class PostService {
     }
 
     @Transactional
+    @PreAuthorize("isAuthenticated() and authentication.principal.userId == #userId")
     public void savePost(PostRequestDTO.CreateAndUpdate request, Long userId) {
         postMapper.save(Post.from(request, userId));
     }

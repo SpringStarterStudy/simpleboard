@@ -7,6 +7,11 @@
     VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt})
   </insert>
 
+  <insert id="insertReply" parameterType="com.study.simpleboard.dto.ReplyCreateDTO">
+    INSERT INTO comment ( user_id, post_id, comment_content, created_at, parent_comment_id )
+    VALUES ( #{userId}, #{postId}, #{commentContent}, #{createdAt}, #{parentId})
+  </insert>
+
   <select id="existsByCommentId" resultType="boolean">
     SELECT EXISTS (
     SELECT 1 FROM comment
@@ -15,7 +20,13 @@
     )
   </select>
 
-  <select id="selectCommentList" resultType="com.study.simpleboard.dto.CommentResponseDTO" parameterType="long">
+  <select id="findPostIdByCommentId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    SELECT post_id
+    FROM comment
+    WHERE comment_id = #{commentId}
+  </select>
+
+  <select id="selectCommentList" resultType="com.study.simpleboard.dto.response.CommentResponseDTO" parameterType="long">
     SELECT c.comment_id, c.user_id, c.post_id, c.parent_comment_id, c.comment_content, c.created_at
     FROM comment c
     WHERE c.post_id = #{postId} AND c.deleted_at IS NULL

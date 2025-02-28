@@ -27,9 +27,10 @@
     </insert>
 
     <select id="existsByName" parameterType="string" resultType="boolean">
-        SELECT EXISTS (SELECT 1
-                       FROM user
-                       WHERE name = #{name}
+        SELECT EXISTS (
+            SELECT 1
+            FROM user
+            WHERE name = #{name}
         )
     </select>
 
@@ -38,6 +39,7 @@
             SELECT 1
             FROM user
             WHERE email = #{email}
+        )
     </select>
 
     <select id="findByEmail" parameterType="string" resultType="com.study.simpleboard.dto.User">
@@ -66,7 +68,7 @@
             created_at,
             updated_at,
             login_type
-        FROM user
+        FROM `user`
         WHERE user_id = #{userId}
     </select>
 
