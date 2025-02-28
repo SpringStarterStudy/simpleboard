@@ -23,7 +23,7 @@ public class PostController {
 
     @GetMapping("/posts")
     public ApiResponse<PostResponseDTO.PostsAndPageResponse<PostResponseDTO.PostList>> getAllPosts(
-            @Valid @ModelAttribute PostResponseDTO.SearchRequest searchRequest
+            @Valid @ModelAttribute PostRequestDTO.SearchRequest searchRequest
             ) {
 
         PostResponseDTO.PostsAndPageResponse<PostResponseDTO.PostList> response =
@@ -47,9 +47,6 @@ public class PostController {
             @Positive(message = "게시물 요청 형식이 올바르지 않습니다.") @PathVariable Long postId
     ) {
         PostResponseDTO.PostDetail response = postService.findPostById(postId);
-
-        postService.incrementViewCountAsync(postId);
-
         return ApiResponse.success("게시물을 성공적으로 조회했습니다.", response);
     }
 

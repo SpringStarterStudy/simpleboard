@@ -27,19 +27,10 @@ public class PostService {
     public PostResponseDTO.PostsAndPageResponse<PostResponseDTO.PostList> findAllPosts(
             Pageable pageable, String searchKeyword, String searchUser
     ) {
-
         long totalPostCount = postMapper.countPosts(searchKeyword, searchUser);
 
         if(totalPostCount == 0) {
-            return PostResponseDTO.PostsAndPageResponse.<PostResponseDTO.PostList>builder()
-                    .postList(List.of())
-                    .currentPage(pageable.getPageNumber() + 1)
-                    .currentSize(0)
-                    .postPerPage(pageable.getPageSize())
-                    .totalPostsCount(0L)
-                    .totalPages(0)
-                    .pageGroupSize(PAGE_GROUP_SIZE)
-                    .build();
+            return PostResponseDTO.PostsAndPageResponse.empty(pageable, PAGE_GROUP_SIZE);
         }
 
         int totalPages = (int) ((totalPostCount + pageable.getPageSize() - 1) / pageable.getPageSize());
@@ -55,15 +46,7 @@ public class PostService {
 
         Page<PostResponseDTO.PostList> postPage = new PageImpl<>(postList, pageable, totalPostCount);
 
-        return PostResponseDTO.PostsAndPageResponse.<PostResponseDTO.PostList>builder()
-                .postList(postPage.getContent())
-                .currentPage(postPage.getNumber() + 1)
-                .currentSize(postPage.getNumberOfElements())
-                .postPerPage(postPage.getSize())
-                .totalPostsCount(postPage.getTotalElements())
-                .totalPages(postPage.getTotalPages())
-                .pageGroupSize(PAGE_GROUP_SIZE)
-                .build();
+        return PostResponseDTO.PostsAndPageResponse.of(postPage, PAGE_GROUP_SIZE);
     }
 
     @Transactional
@@ -72,17 +55,12 @@ public class PostService {
         postMapper.save(Post.from(request, userId));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponseDTO.PostDetail findPostById(Long postId) {
         PostResponseDTO.PostDetail post =
                 postMapper.selectPostById(postId).orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-        return post;
-    }
-
-    @Transactional
-    @Async
-    public void incrementViewCountAsync(Long postId) {
         postMapper.updateViewCount(postId);
+        return post;
     }
 
     @Transactional

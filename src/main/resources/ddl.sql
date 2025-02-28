@@ -22,3 +22,10 @@ DROP FOREIGN KEY FK_user_TO_reaction_1,
 ADD CONSTRAINT FK_user_TO_reaction_cascade
 FOREIGN KEY (user_id) REFERENCES user(user_id)
 ON DELETE CASCADE;
+
+-- 전체 게시물 조회의 searchKeyword 풀텍스트 인덱스 사용
+CREATE FULLTEXT INDEX idx_title_content ON post(post_title, post_content);
+
+-- 게시물 조회시 조회수 업데이트에 따른 게시물 수정현상 방지
+ALTER TABLE post
+MODIFY COLUMN updated_at TIMESTAMP NULL;
