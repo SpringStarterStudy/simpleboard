@@ -31,6 +31,4 @@ public interface PostMapper {
     void updatePostById(Long postId, @Param("post") Post post);
 
     void deletePostById(Long postId);
-
-    boolean existsById(Long postId);
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public class PostResponseDTO {
 
     @Getter
+    @Builder
     public static class PostList {
         private Long id;
         private Long userId;
@@ -34,15 +35,15 @@ public class PostResponseDTO {
         private Integer pageGroupSize;  // 페이지 그룹의 크기 (default:5)
 
         public static PostsAndPageResponse<PostList> of(Page<PostList> postPage, int pageGroupSize) {
-            return new PostsAndPageResponse<>(
-                    postPage.getContent(),
-                    postPage.getNumber() + 1,
-                    postPage.getNumberOfElements(),
-                    postPage.getSize(),
-                    postPage.getTotalElements(),
-                    postPage.getTotalPages(),
-                    pageGroupSize
-            );
+            return PostsAndPageResponse.<PostList>builder()
+                    .postList(postPage.getContent())
+                    .currentPage(postPage.getNumber() + 1)
+                    .currentSize(postPage.getNumberOfElements())
+                    .postPerPage(postPage.getSize())
+                    .totalPostsCount(postPage.getTotalElements())
+                    .totalPages(postPage.getTotalPages())
+                    .pageGroupSize(pageGroupSize)
+                    .build();
         }
 
         public static <T> PostsAndPageResponse<T> empty(Pageable pageable, int pageGroupSize) {
