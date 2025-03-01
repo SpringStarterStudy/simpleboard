@@ -1,0 +1,179 @@
+package com.study.simpleboard;
+
+import com.google.gson.Gson;
+import com.study.simpleboard.common.exception.ErrorCode;
+import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.request.PostRequestDTO;
+import com.study.simpleboard.dto.response.PostResponseDTO;
+import com.study.simpleboard.mapper.PostMapper;
+import com.study.simpleboard.mapper.UserMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@Sql(scripts = "/post_data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class PostIntegrationTest {
+    private final static Gson gson = new Gson();
+
+    @Autowired
+    private WebApplicationContext context;
+    private MockMvc mockMvc;
+
+    @Autowired
+    private PostMapper postMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @BeforeEach
+    public void init() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        CustomUserDetails userDetails = createUserDetails();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+    }
+
+    private CustomUserDetails createUserDetails() {
+        return new CustomUserDetails(userMapper.findById(1L).get());
+    }
+
+    @Test
+    @DisplayName("게시글 작성")
+    void savePost() throws Exception {
+        // given
+        String title = "제목 테스트";
+        String content = "내용 테스트";
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value("게시물이 저장되었습니다."));
+
+        long postId = 1L;
+        Optional<PostResponseDTO.PostDetail> postData = postMapper.selectPostById(postId);
+        assertThat(postData).isPresent();
+        PostResponseDTO.PostDetail post = postData.get();
+        assertThat(post.getTitle()).isEqualTo(title);
+        assertThat(post.getContent()).isEqualTo(content);
+    }
+
+    @Test
+    @DisplayName("게시글 작성 - 제목이 null일 경우")
+    void savePost_whenTitleIsNull_returnError() throws Exception {
+        // given
+        String title = null;
+        String content = "내용 테스트";
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.message").value("제목을 입력해주세요."));
+    }
+
+    @Test
+    @DisplayName("게시글 작성 - 제목이 공백일 경우")
+    void savePost_whenTitleIsBlank_returnError() throws Exception {
+        // given
+        String title = "    ";
+        String content = "내용 테스트";
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.message").value("제목을 입력해주세요."));
+    }
+
+    @Test
+    @DisplayName("게시글 작성 - 내용이 null일 경우")
+    void savePost_whenContentIsNull_returnError() throws Exception {
+        // given
+        String title = "제목 테스트";
+        String content = null;
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
+    }
+
+    @Test
+    @DisplayName("게시글 작성 - 내용이 공백일 경우")
+    void savePost_whenContextIsBlank_returnError() throws Exception {
+        // given
+        String title = "내용 테스트";
+        String content = "    ";
+        PostRequestDTO.CreateAndUpdate mockRequest = createRequest(title, content);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(gson.toJson(mockRequest))
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ErrorCode.VALIDATION_EXCEPTION.getStatus().value()))
+                .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_EXCEPTION.getCode()))
+                .andExpect(jsonPath("$.message").value("내용을 입력해주세요."));
+    }
+
+    private static PostRequestDTO.CreateAndUpdate createRequest(String title, String content) {
+        return new PostRequestDTO.CreateAndUpdate(title, content);
+    }
+}
