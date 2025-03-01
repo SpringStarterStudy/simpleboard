@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/login/kakao").permitAll() // 누구나 접근 가능
+                        .requestMatchers("/", "/api/users/signup", "/api/users/login", "/api/users/oauth/kakao",
+                                "/api/users/oauth/kakao/callback").permitAll() // 누구나 접근 가능
                         .requestMatchers(HttpMethod.GET, "/api/posts/**", "/api/comments/**").permitAll()  // GET 요청은 모두 허용
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/posts/**", "/api/comments/**").hasAnyRole("USER", "ADMIN")

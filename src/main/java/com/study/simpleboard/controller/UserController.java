@@ -2,23 +2,42 @@ package com.study.simpleboard.controller;
 
 import com.study.simpleboard.common.response.ApiResponse;
 import com.study.simpleboard.dto.CustomUserDetails;
+import com.study.simpleboard.dto.User;
 import com.study.simpleboard.dto.request.*;
 import com.study.simpleboard.dto.response.UserResponse;
+import com.study.simpleboard.service.KakaoUserService;
 import com.study.simpleboard.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
+import java.util.Collections;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final KakaoUserService kakaoUserService;
+
+    @Value("${kakao.client.id}")
+    private String clientId;
+
+    @Value("${kakao.client.redirect-uri}")
+    private String redirectUri;
 
     // 회원 가입
     @PostMapping("/signup")
@@ -65,8 +84,43 @@ public class UserController {
             @Valid @RequestBody DeleteUserRequest deleteUserRequest,
             HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         userService.deleteUser(userDetails.getUserId(), deleteUserRequest.getPassword());
-        new SecurityContextLogoutHandler().logout(httpRequest, null, null);
+        // new SecurityContextLogoutHandler().logout(httpRequest, null, null);
+        SecurityContextHolder.clearContext(); // SecurityContextHolder를 직접 사용
         return ApiResponse.success(null);
     }
 
+    // 카카오 인증 페이지로 리다이렉트
+    @GetMapping("/oauth/kakao")
+    public void redirectToKakaoAuthorization(HttpServletResponse response) throws IOException {
+        String kakaoAuthorizationUrl = UriComponentsBuilder.fromHttpUrl("https://kauth.kakao.com/oauth/authorize")
+                .queryParam("client_id", clientId)
+                .queryParam("redirect_uri", redirectUri)
+                .queryParam("response_type", "code")
+                .queryParam("scope", "profile_nickname,account_email")
+                .build().toUriString();
+
+        response.sendRedirect(kakaoAuthorizationUrl);
+    }
+
+    // 카카오 로그인 콜백 처리 (redirect_uri와 일치하는 경로로 변경)
+    @GetMapping("/oauth/kakao/callback")  // 카카오 개발자 콘솔의 redirect_uri와 일치
+    public ApiResponse<UserResponse> kakaoLogin(@RequestParam String code) {
+        log.info("Received code in controller: {}", code);
+        UserResponse userResponse = kakaoUserService.loginKakaoUser(code);
+        return ApiResponse.success(userResponse);
+    }
+
+    // 카카오 로그아웃
+    @PostMapping("/oauth/kakao/logout")
+    public ApiResponse<Void> kakaoLogout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        kakaoUserService.kakaoLogout(userDetails);
+        return ApiResponse.success(null);
+    }
+
+    // 카카오 유저 회원탈퇴
+    @DeleteMapping("/oauth/kakao")
+    public ApiResponse<Void> withdrawKakaoUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        kakaoUserService.deleteKakaoUser(userDetails.getUserId());
+        return ApiResponse.success(null);
+    }
 }
